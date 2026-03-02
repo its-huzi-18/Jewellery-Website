@@ -16,6 +16,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OrdersPage from './pages/OrdersPage';
+import OrderDetailPage from './pages/OrderDetailPage';
 import ProfilePage from './pages/ProfilePage';
 
 // Admin Pages
@@ -23,6 +24,7 @@ import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
+import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminSettings from './pages/admin/AdminSettings';
 
 // Suppress React Router v7 deprecation warnings
@@ -107,7 +109,7 @@ function AppRoutes() {
       } />
       <Route path="/orders/:id" element={
         <ProtectedRoute>
-          <MainLayout><div className="pt-28 container-custom"><h1>Order Details</h1></div></MainLayout>
+          <MainLayout><OrderDetailPage /></MainLayout>
         </ProtectedRoute>
       } />
 
@@ -121,7 +123,7 @@ function AppRoutes() {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="products" element={<AdminProducts />} />
         <Route path="orders" element={<AdminOrders />} />
-        <Route path="customers" element={<div className="text-center py-12"><h2 className="text-2xl font-semibold">Customers Page - Coming Soon</h2></div>} />
+        <Route path="customers" element={<AdminCustomers />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
 
