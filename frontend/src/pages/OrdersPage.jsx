@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { orderAPI } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import toast from 'react-hot-toast';
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
@@ -22,6 +23,24 @@ const OrdersPage = () => {
 
     fetchOrders();
   }, []);
+
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) {
+      return;
+    }
+
+    try {
+      await orderAPI.cancelOrder(orderId);
+      toast.success('Order cancelled successfully');
+      setOrders(orders.map(order => 
+        order._id === orderId 
+          ? { ...order, orderStatus: 'cancelled', cancelledAt: new Date().toISOString() }
+          : order
+      ));
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to cancel order');
+    }
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -139,7 +158,11 @@ const OrdersPage = () => {
                     <p>{order.shippingAddress.street}, {order.shippingAddress.city}</p>
                   </div>
                   {order.orderStatus === 'pending' || order.orderStatus === 'processing' ? (
-                    <button className="btn-outline text-sm py-2">
+                    <button 
+                      onClick={() => handleCancelOrder(order._id)}
+                      className="btn-outline text-sm py-2 flex items-center gap-2 text-red-600 border-red-300 hover:bg-red-50"
+                    >
+                      <XCircle className="w-4 h-4" />
                       Cancel Order
                     </button>
                   ) : (

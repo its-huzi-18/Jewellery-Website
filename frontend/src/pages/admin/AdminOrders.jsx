@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Eye, CheckCircle, Clock, Package, XCircle } from 'lucide-react';
+import { Eye, CheckCircle, Clock, Package, XCircle, Trash2, Filter } from 'lucide-react';
 import { orderAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -10,6 +10,8 @@ const AdminOrders = () => {
   const [filterStatus, setFilterStatus] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -38,6 +40,39 @@ const AdminOrders = () => {
       }
     } catch (error) {
       toast.error('Failed to update order status');
+    }
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    try {
+      await orderAPI.cancelOrder(orderId);
+      toast.success('Order cancelled successfully');
+      fetchOrders();
+      if (selectedOrder?._id === orderId) {
+        setSelectedOrder(prev => ({ ...prev, orderStatus: 'cancelled' }));
+      }
+      setShowModal(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to cancel order');
+    }
+  };
+
+  const confirmDeleteOrder = (order) => {
+    setOrderToDelete(order);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteOrder = async () => {
+    if (!orderToDelete) return;
+    
+    try {
+      await orderAPI.deleteOrder(orderToDelete._id);
+      toast.success('Order deleted successfully');
+      fetchOrders();
+      setShowDeleteModal(false);
+      setOrderToDelete(null);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete order');
     }
   };
 
@@ -174,6 +209,15 @@ const AdminOrders = () => {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
+                      {(order.orderStatus === 'cancelled' || order.orderStatus === 'delivered') && (
+                        <button
+                          onClick={() => confirmDeleteOrder(order)}
+                          className="p-2 text-red-400 hover:text-red-600 transition-colors"
+                          title="Delete Order"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -299,7 +343,7 @@ const AdminOrders = () => {
               {selectedOrder.orderStatus !== 'cancelled' && selectedOrder.orderStatus !== 'delivered' && (
                 <div>
                   <h3 className="font-semibold text-black-900 mb-3">Update Status</h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {['pending', 'processing', 'shipped', 'delivered'].map((status) => (
                       <button
                         key={status}
@@ -315,8 +359,70 @@ const AdminOrders = () => {
                       </button>
                     ))}
                   </div>
+                  {selectedOrder.orderStatus === 'pending' || selectedOrder.orderStatus === 'processing' ? (
+                    <button
+                      onClick={() => handleCancelOrder(selectedOrder._id)}
+                      className="w-full px-4 py-2 text-sm font-medium rounded capitalize transition-colors bg-red-100 text-red-700 hover:bg-red-200 flex items-center justify-center gap-2"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Cancel Order
+                    </button>
+                  ) : null}
                 </div>
               )}
+
+              {/* Delete Order (for cancelled/delivered) */}
+              {(selectedOrder.orderStatus === 'cancelled' || selectedOrder.orderStatus === 'delivered') && (
+                <div>
+                  <h3 className="font-semibold text-black-900 mb-3 text-red-600">Danger Zone</h3>
+                  <button
+                    onClick={() => { setShowModal(false); confirmDeleteOrder(selectedOrder); }}
+                    className="w-full px-4 py-2 text-sm font-medium rounded capitalize transition-colors bg-red-600 text-white hover:bg-red-700 flex items-center justify-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Order Permanently
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && orderToDelete && (
+        <div className="fixed inset-0 bg-black-900/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl font-semibold text-black-900">Delete Order</h3>
+                <p className="text-sm text-black-500">This action cannot be undone</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-black-700">
+                Are you sure you want to delete order <span className="font-medium">{orderToDelete.orderNumber}</span>?
+                This will permanently remove all order data including customer information and order history.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowDeleteModal(false); setOrderToDelete(null); }}
+                className="flex-1 px-4 py-2 border border-black-300 text-black-700 rounded-lg hover:bg-black-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteOrder}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete Order
+              </button>
             </div>
           </div>
         </div>

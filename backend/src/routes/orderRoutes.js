@@ -6,6 +6,7 @@ import {
   getAllOrders,
   updateOrderStatus,
   cancelOrder,
+  deleteOrder,
   getOrderStats
 } from '../controllers/orderController.js';
 import { protect, authorize } from '../middleware/auth.js';
@@ -17,8 +18,9 @@ const router = express.Router();
 // Admin routes - specific
 router.get('/stats', protect, authorize('admin'), getOrderStats);
 router.get('/', protect, authorize('admin'), getAllOrders);
+router.delete('/:id', protect, authorize('admin'), deleteOrder);
 
-// User routes - specific  
+// User routes - specific
 router.get('/my-orders', protect, getMyOrders);
 router.post('/', protect, createOrder);
 

@@ -352,6 +352,44 @@ export const cancelOrder = async (req, res) => {
   }
 };
 
+// @desc    Delete order (Admin only)
+// @route   DELETE /api/orders/:id
+// @access  Private/Admin
+export const deleteOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // Can only delete cancelled or delivered orders
+    if (!['cancelled', 'delivered'].includes(order.orderStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Can only delete cancelled or delivered orders'
+      });
+    }
+
+    await Order.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Order deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete order error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
 // @desc    Get order statistics (Admin only)
 // @route   GET /api/orders/stats
 // @access  Private/Admin
