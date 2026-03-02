@@ -2,6 +2,7 @@ import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 
 // Simple memory storage - works everywhere including Vercel
+// Updated: 2026-03-02 - Fixed for ES modules
 const storage = multer.memoryStorage();
 
 // File filter for images only
