@@ -20,7 +20,12 @@ app.use((req, res, next) => {
 
 // Middleware
 app.use(cors({
-  origin: true,  // Allow all origins for debugging
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://jewellery-website-*.vercel.app',  // Vercel frontend
+    process.env.FRONTEND_URL || '*'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { authAPI } from '../services/api';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate
     const newErrors = {};
     if (!formData.email.trim()) {
@@ -42,7 +43,7 @@ const LoginPage = () => {
     if (!formData.password) {
       newErrors.password = 'Password is required';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -50,36 +51,28 @@ const LoginPage = () => {
 
     setLoading(true);
     setServerError('');
-    
-    // Call login API directly
+
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: formData.email, password: formData.password })
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
+      const response = await authAPI.login(formData);
+      const data = response.data;
+
+      if (data.success) {
         // Success - save to localStorage
         localStorage.setItem('token', data.data.token);
         localStorage.setItem('user', JSON.stringify(data.data.user));
-        
+
         // Force reload to update AuthContext
         window.location.href = data.data.user.role === 'admin' ? '/admin/dashboard' : (from || '/');
       } else {
         // Error - show message
         const message = data.message || 'Login failed';
-        
+
         if (message.includes('not found') || message.includes('not signed up')) {
           setServerError('You are not signed up. Please create an account first.');
         } else if (message.includes('Invalid credentials')) {
-          setErrors({ 
-            email: 'Incorrect email or password', 
-            password: 'Incorrect email or password' 
+          setErrors({
+            email: 'Incorrect email or password',
+            password: 'Incorrect email or password'
           });
         } else {
           setServerError(message);
@@ -87,7 +80,13 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      setServerError('Network error. Please check your connection.');
+      if (error.code === 'ERR_NETWORK' || error.message?.includes('Network')) {
+        setServerError('Cannot connect to server. Please try again later.');
+      } else if (error.response?.data?.message) {
+        setServerError(error.response.data.message);
+      } else {
+        setServerError('Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
