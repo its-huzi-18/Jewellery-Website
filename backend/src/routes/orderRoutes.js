@@ -25,7 +25,7 @@ router.get('/my-orders', protect, getMyOrders);
 router.post('/', protect, createOrder);
 
 // Parameterized routes - specific patterns first
-router.get('/:id/cancel', protect, cancelOrder);
+router.put('/:id/cancel', protect, cancelOrder);
 router.put('/:id/status', protect, authorize('admin'), updateOrderStatus);
 
 // Generic parameterized route - MUST BE LAST
