@@ -16,7 +16,7 @@ import settingRoutes from './routes/settingRoutes.js';
 dotenv.config();
 
 // Connect to database
-connectDB();
+await connectDB();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -75,11 +75,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+// Vercel serverless function handler
+export const handler = async (req, res) => {
+  await connectDB();
+  app(req, res);
+};
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
-  console.log(`📍 API available at http://localhost:${PORT}/api`);
-});
-
+// Vercel export - no listen() for serverless
 export default app;
