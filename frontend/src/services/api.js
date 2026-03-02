@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Use env variable if available, otherwise use production backend URL
+const API_URL = import.meta.env.VITE_API_URL || 'https://jewellery-website-backend-eta.vercel.app/api';
 
 const api = axios.create({
   baseURL: API_URL,
