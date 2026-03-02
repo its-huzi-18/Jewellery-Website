@@ -15,9 +15,6 @@ import settingRoutes from './routes/settingRoutes.js';
 // Load env vars
 dotenv.config();
 
-// Connect to database
-await connectDB();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -77,7 +74,11 @@ app.use((err, req, res, next) => {
 
 // Vercel serverless function handler
 export const handler = async (req, res) => {
-  await connectDB();
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error('DB connection error in handler:', err);
+  }
   app(req, res);
 };
 
