@@ -1,9 +1,25 @@
 import { Link } from 'react-router-dom';
 import { ShoppingBag, Star, Heart } from 'lucide-react';
+import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ product }) => {
   const { addToCart, loading } = useCart();
+  
+  // Fallback image if mainImage fails
+  const getFallbackImage = (category) => {
+    const fallbacks = {
+      rings: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=400&fit=crop',
+      bracelets: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&h=400&fit=crop',
+      necklaces: 'https://images.unsplash.com/photo-1599643478518-17488fbbcd75?w=400&h=400&fit=crop',
+      earrings: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&h=400&fit=crop',
+      charms: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&h=400&fit=crop',
+      default: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=400&fit=crop'
+    };
+    return fallbacks[category] || fallbacks.default;
+  };
+
+  const [imageError, setImageError] = useState(false);
 
   const discountedPrice = product.discount > 0
     ? (product.price * (1 - product.discount / 100)).toFixed(2)
@@ -18,6 +34,8 @@ const ProductCard = ({ product }) => {
       // Error handled in context
     }
   };
+
+  const displayImage = imageError ? getFallbackImage(product.category) : (product.mainImage || getFallbackImage(product.category));
 
   return (
     <Link to={`/products/${product._id}`} className="product-card group block animate-fade-in">
@@ -45,9 +63,10 @@ const ProductCard = ({ product }) => {
         {/* Product image */}
         <div className="product-image relative bg-gradient-to-br from-black-50 to-black-100">
           <img
-            src={product.mainImage || 'https://via.placeholder.com/400x400?text=Product'}
+            src={displayImage}
             alt={product.title}
             loading="lazy"
+            onError={() => setImageError(true)}
             className="w-full h-full object-cover object-center"
           />
           {/* Image overlay on hover */}
