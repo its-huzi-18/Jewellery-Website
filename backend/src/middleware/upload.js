@@ -1,5 +1,8 @@
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 // Check if Cloudinary is configured
 const isCloudinaryConfigured = () => {
@@ -8,22 +11,32 @@ const isCloudinaryConfigured = () => {
             process.env.CLOUDINARY_API_SECRET);
 };
 
-// Lazy load Cloudinary only when configured
+// Initialize Cloudinary
 let cloudinary = null;
 let CloudinaryStorage = null;
+let initialized = false;
 
 const initCloudinary = () => {
-  if (!cloudinary && isCloudinaryConfigured()) {
-    const cloudinaryModule = require('cloudinary').v2;
-    cloudinaryModule.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET
-    });
-    cloudinary = cloudinaryModule;
-    CloudinaryStorage = require('multer-storage-cloudinary').CloudinaryStorage;
+  if (initialized) return cloudinary !== null;
+  initialized = true;
+  
+  if (isCloudinaryConfigured()) {
+    try {
+      const cloudinaryModule = require('cloudinary').v2;
+      cloudinaryModule.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+      });
+      cloudinary = cloudinaryModule;
+      CloudinaryStorage = require('multer-storage-cloudinary').CloudinaryStorage;
+      return true;
+    } catch (error) {
+      console.error('Failed to initialize Cloudinary:', error.message);
+      return false;
+    }
   }
-  return cloudinary !== null;
+  return false;
 };
 
 // Get storage configuration
@@ -70,18 +83,16 @@ export const upload = multer({
 
 // Image processing
 export const processImage = async (file) => {
-  if (!isCloudinaryConfigured()) {
+  if (!cloudinary) {
     console.warn('Cloudinary not configured - returning file info');
-    // For memory storage, file is a buffer - return basic info
     return {
-      url: file.path || 'https://via.placeholder.com/800x800?text=Product+Image',
+      url: file.location || file.path || 'https://via.placeholder.com/800x800?text=Product+Image',
       publicId: file.filename || 'placeholder',
-      thumbnailUrl: file.path || 'https://via.placeholder.com/300x300?text=Product+Image'
+      thumbnailUrl: file.location || file.path || 'https://via.placeholder.com/300x300?text=Product+Image'
     };
   }
 
   try {
-    // Cloudinary already processed the image during upload
     return {
       url: file.path,
       publicId: file.filename,
