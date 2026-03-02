@@ -308,8 +308,8 @@ export const cancelOrder = async (req, res) => {
       });
     }
 
-    // Check if user owns the order
-    if (order.user.toString() !== req.user._id.toString()) {
+    // Check if user owns the order OR is admin
+    if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to cancel this order'
