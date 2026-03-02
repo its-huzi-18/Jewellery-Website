@@ -1,11 +1,5 @@
 import Product from '../models/Product.js';
 import { processImage } from '../middleware/upload.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // @desc    Get all products with filtering, sorting, pagination
 // @route   GET /api/products
@@ -154,10 +148,11 @@ export const createProduct = async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        const processedImage = await processImage(file.path, file.filename);
+        const processedImage = await processImage(file);
         images.push({
           url: processedImage.url,
-          publicId: processedImage.webp
+          publicId: processedImage.publicId,
+          thumbnailUrl: processedImage.thumbnailUrl
         });
       }
       mainImage = images[0]?.url || '';
@@ -230,26 +225,14 @@ export const updateProduct = async (req, res) => {
 
     // Process new images if uploaded
     if (req.files && req.files.length > 0) {
-      // Remove old images
-      for (const img of product.images) {
-        const oldImagePath = path.join(__dirname, '../../uploads/products', img.publicId);
-        const oldThumbPath = path.join(__dirname, '../../uploads/products', img.publicId.replace('.webp', '_thumb.webp'));
-        
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-        if (fs.existsSync(oldThumbPath)) {
-          fs.unlinkSync(oldThumbPath);
-        }
-      }
-
       // Add new images
       product.images = [];
       for (const file of req.files) {
-        const processedImage = await processImage(file.path, file.filename);
+        const processedImage = await processImage(file);
         product.images.push({
           url: processedImage.url,
-          publicId: processedImage.webp
+          publicId: processedImage.publicId,
+          thumbnailUrl: processedImage.thumbnailUrl
         });
       }
       product.mainImage = product.images[0]?.url || '';
