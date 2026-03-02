@@ -154,7 +154,7 @@ const AdminOrders = () => {
                   </td>
                   <td className="px-6 py-4">
                     <span className="font-semibold text-gold-600">
-                      ${order.total.toFixed(2)}
+                      Rs. {order.total.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -258,11 +258,11 @@ const AdminOrders = () => {
                         <p className="font-medium text-black-900">{item.title}</p>
                         <p className="text-sm text-black-500">Quantity: {item.quantity}</p>
                         <p className="text-sm text-gold-600 font-semibold">
-                          ${item.price.toFixed(2)}
+                          Rs. {item.price.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                       </div>
                       <p className="font-semibold text-black-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        Rs. {(item.price * item.quantity).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                     </div>
                   ))}
@@ -274,23 +274,23 @@ const AdminOrders = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-black-600">
                     <span>Subtotal</span>
-                    <span>${selectedOrder.subtotal.toFixed(2)}</span>
+                    <span>Rs. {selectedOrder.subtotal.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-black-600">
                     <span>Discount</span>
-                    <span>-${selectedOrder.discount.toFixed(2)}</span>
+                    <span>-Rs. {selectedOrder.discount.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-black-600">
                     <span>Shipping</span>
-                    <span>${selectedOrder.shippingCost.toFixed(2)}</span>
+                    <span>Rs. {selectedOrder.shippingCost.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-black-600">
                     <span>Tax</span>
-                    <span>${selectedOrder.tax.toFixed(2)}</span>
+                    <span>Rs. {selectedOrder.tax.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="border-t pt-2 flex justify-between font-semibold text-lg">
                     <span>Total</span>
-                    <span className="text-gold-600">${selectedOrder.total.toFixed(2)}</span>
+                    <span className="text-gold-600">Rs. {selectedOrder.total.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 </div>
               </div>

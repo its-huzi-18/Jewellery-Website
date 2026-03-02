@@ -39,6 +39,11 @@ const AdminLayout = () => {
     fetchStats();
   }, []);
 
+  const getTotalOrders = () => {
+    if (!stats) return 0;
+    return stats.totalOrders || 0;
+  };
+
   return (
     <div className="min-h-screen bg-black-100">
       {/* Mobile sidebar overlay */}
@@ -65,19 +70,29 @@ const AdminLayout = () => {
         <nav className="mt-6">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
+            const showOrderCount = item.label === 'Orders' && stats;
+            const orderCount = showOrderCount ? getTotalOrders() : 0;
+            
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center gap-3 px-6 py-3 transition-colors ${
+                className={`flex items-center justify-between gap-3 px-6 py-3 transition-colors ${
                   isActive
                     ? 'bg-gold-600 text-white'
                     : 'text-black-300 hover:bg-black-800 hover:text-white'
                 }`}
               >
-                <item.icon className="w-5 h-5" />
-                <span>{item.label}</span>
+                <div className="flex items-center gap-3">
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                </div>
+                {showOrderCount && orderCount > 0 && (
+                  <span className="bg-gold-600 text-white text-xs px-2 py-0.5 rounded-full">
+                    {orderCount}
+                  </span>
+                )}
               </Link>
             );
           })}
