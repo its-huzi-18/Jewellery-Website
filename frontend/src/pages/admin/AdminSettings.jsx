@@ -85,11 +85,11 @@ const AdminSettings = () => {
           siteName: settings.siteName || 'Black & Gold',
           siteTagline: settings.siteTagline || '',
           siteDescription: settings.siteDescription || '',
-          currency: settings.currency || 'USD',
-          currencySymbol: settings.currencySymbol || '$',
+          currency: settings.currency || 'PKR',
+          currencySymbol: settings.currencySymbol || 'Rs.',
           taxRate: settings.taxRate || 8,
-          freeShippingThreshold: settings.freeShippingThreshold || 100,
-          shippingCost: settings.shippingCost || 10
+          freeShippingThreshold: settings.freeShippingThreshold || 15000,
+          shippingCost: settings.shippingCost || 200
         });
         setContactInfo({
           contactEmail: settings.contactEmail || '',
@@ -513,7 +513,7 @@ const AdminSettings = () => {
                   <div>
                     <label className="block text-sm font-medium text-black-700 mb-2">
                       <Truck className="w-4 h-4 inline mr-1" />
-                      Free Shipping Threshold ($)
+                      Free Shipping Threshold (Rs.)
                     </label>
                     <input
                       type="number"
@@ -526,7 +526,7 @@ const AdminSettings = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-black-700 mb-2">
-                      Shipping Cost ($)
+                      Shipping Cost (Rs.)
                     </label>
                     <input
                       type="number"

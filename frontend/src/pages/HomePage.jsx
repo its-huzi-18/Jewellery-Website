@@ -53,7 +53,7 @@ const HomePage = () => {
     {
       icon: <Truck className="w-8 h-8" />,
       title: 'Free Shipping',
-      description: 'Complimentary shipping on orders over $100'
+      description: 'Complimentary shipping on orders over Rs. 15,000'
     },
     {
       icon: <Shield className="w-8 h-8" />,

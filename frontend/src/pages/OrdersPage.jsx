@@ -91,7 +91,9 @@ const OrdersPage = () => {
                   </div>
                   <div>
                     <p className="text-sm text-black-500">Total</p>
-                    <p className="font-semibold text-gold-600">${order.total.toFixed(2)}</p>
+                    <p className="font-semibold text-gold-600">
+                      Rs. {order.total.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
                   </div>
                   <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${getStatusColor(order.orderStatus)}`}>
                     {getStatusIcon(order.orderStatus)}
@@ -122,7 +124,7 @@ const OrdersPage = () => {
                             Quantity: {item.quantity}
                           </p>
                           <p className="text-sm font-semibold text-gold-600">
-                            ${item.price.toFixed(2)}
+                            Rs. {item.price.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </p>
                         </div>
                       </div>
