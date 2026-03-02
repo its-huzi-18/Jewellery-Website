@@ -1,9 +1,93 @@
-import app from '../src/server.js';
-import connectDB from '../src/config/db.js';
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Load env vars
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+
+// Request logging
+app.use((req, res, next) => {
+  console.log(`[API] ${req.method} ${req.originalUrl || req.url}`);
+  next();
+});
+
+// Middleware
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', '*'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Static files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Black & Gold eCommerce API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found'
+  });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Server Error:', err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+
+// Vercel handler
+export const config = {
+  runtime: 'nodejs',
+};
 
 export default async function handler(req, res) {
+  console.log('Incoming request:', req.method, req.url);
+  
+  // Import routes dynamically inside handler
+  const authRoutes = (await import('../src/routes/authRoutes.js')).default;
+  const productRoutes = (await import('../src/routes/productRoutes.js')).default;
+  const cartRoutes = (await import('../src/routes/cartRoutes.js')).default;
+  const orderRoutes = (await import('../src/routes/orderRoutes.js')).default;
+  const settingRoutes = (await import('../src/routes/settingRoutes.js')).default;
+  
+  // Setup routes on first request (could be cached)
+  if (!app._routesSetup) {
+    app.use('/api/auth', authRoutes);
+    app.use('/api/products', productRoutes);
+    app.use('/api/cart', cartRoutes);
+    app.use('/api/orders', orderRoutes);
+    app.use('/api/settings', settingRoutes);
+    app._routesSetup = true;
+  }
+  
+  // Connect to DB
   try {
+    const { default: connectDB } = await import('../src/config/db.js');
     await connectDB();
+    console.log('Database connected');
   } catch (err) {
     console.error('DB connection error:', err.message);
   }

@@ -20,6 +20,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl || req.url}`);
+  next();
+});
+
 // Middleware
 app.use(cors({
   origin: [
