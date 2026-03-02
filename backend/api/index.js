@@ -42,6 +42,7 @@ app.get('/api/health', (req, res) => {
 
 // 404 handler
 app.use((req, res) => {
+  console.log('404 - Route not found:', req.method, req.originalUrl);
   res.status(404).json({
     success: false,
     message: 'Route not found'
@@ -65,15 +66,26 @@ export const config = {
 
 export default async function handler(req, res) {
   console.log('Incoming request:', req.method, req.url);
-  
-  // Import routes dynamically inside handler
-  const authRoutes = (await import('../src/routes/authRoutes.js')).default;
-  const productRoutes = (await import('../src/routes/productRoutes.js')).default;
-  const cartRoutes = (await import('../src/routes/cartRoutes.js')).default;
-  const orderRoutes = (await import('../src/routes/orderRoutes.js')).default;
-  const settingRoutes = (await import('../src/routes/settingRoutes.js')).default;
-  
-  // Setup routes on first request (could be cached)
+
+  // Import routes dynamically
+  const [authRoutes, productRoutes, cartRoutes, orderRoutes, settingRoutes, connectDB] = await Promise.all([
+    import('../src/routes/authRoutes.js').then(m => m.default),
+    import('../src/routes/productRoutes.js').then(m => m.default),
+    import('../src/routes/cartRoutes.js').then(m => m.default),
+    import('../src/routes/orderRoutes.js').then(m => m.default),
+    import('../src/routes/settingRoutes.js').then(m => m.default),
+    import('../src/config/db.js').then(m => m.default),
+  ]);
+
+  // Connect to DB
+  try {
+    await connectDB();
+    console.log('Database connected');
+  } catch (err) {
+    console.error('DB connection error:', err.message);
+  }
+
+  // Setup routes once
   if (!app._routesSetup) {
     app.use('/api/auth', authRoutes);
     app.use('/api/products', productRoutes);
@@ -81,16 +93,8 @@ export default async function handler(req, res) {
     app.use('/api/orders', orderRoutes);
     app.use('/api/settings', settingRoutes);
     app._routesSetup = true;
+    console.log('Routes configured');
   }
-  
-  // Connect to DB
-  try {
-    const { default: connectDB } = await import('../src/config/db.js');
-    await connectDB();
-    console.log('Database connected');
-  } catch (err) {
-    console.error('DB connection error:', err.message);
-  }
-  
+
   return app(req, res);
 }
