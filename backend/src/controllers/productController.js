@@ -1,5 +1,5 @@
 import Product from '../models/Product.js';
-import { processImage } from '../middleware/upload.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../middleware/upload.js';
 
 // @desc    Get all products with filtering, sorting, pagination
 // @route   GET /api/products
@@ -82,9 +82,7 @@ export const getProducts = async (req, res) => {
           page: Number(page),
           limit: Number(limit),
           total,
-          totalPages,
-          hasNext: page < totalPages,
-          hasPrev: page > 1
+          totalPages
         }
       }
     });
@@ -139,23 +137,24 @@ export const createProduct = async (req, res) => {
       category,
       stock,
       featured,
-      specifications
+      specifications,
+      imageUrls
     } = req.body;
 
-    // Process uploaded images
+    // Parse imageUrls if it's a string
     let images = [];
     let mainImage = '';
 
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const processedImage = await processImage(file);
-        images.push({
-          url: processedImage.url,
-          publicId: processedImage.publicId,
-          thumbnailUrl: processedImage.thumbnailUrl
-        });
+    if (imageUrls) {
+      try {
+        const parsedUrls = typeof imageUrls === 'string' ? JSON.parse(imageUrls) : imageUrls;
+        if (Array.isArray(parsedUrls)) {
+          images = parsedUrls.map(url => ({ url, publicId: '' }));
+          mainImage = images[0]?.url || '';
+        }
+      } catch (e) {
+        console.error('Error parsing imageUrls:', e);
       }
-      mainImage = images[0]?.url || '';
     }
 
     const product = await Product.create({
@@ -209,7 +208,8 @@ export const updateProduct = async (req, res) => {
       stock,
       featured,
       isActive,
-      specifications
+      specifications,
+      imageUrls
     } = req.body;
 
     // Update fields
@@ -223,19 +223,17 @@ export const updateProduct = async (req, res) => {
     if (isActive !== undefined) product.isActive = isActive;
     if (specifications) product.specifications = specifications;
 
-    // Process new images if uploaded
-    if (req.files && req.files.length > 0) {
-      // Add new images
-      product.images = [];
-      for (const file of req.files) {
-        const processedImage = await processImage(file);
-        product.images.push({
-          url: processedImage.url,
-          publicId: processedImage.publicId,
-          thumbnailUrl: processedImage.thumbnailUrl
-        });
+    // Update images if provided
+    if (imageUrls) {
+      try {
+        const parsedUrls = typeof imageUrls === 'string' ? JSON.parse(imageUrls) : imageUrls;
+        if (Array.isArray(parsedUrls)) {
+          product.images = parsedUrls.map(url => ({ url, publicId: '' }));
+          product.mainImage = product.images[0]?.url || '';
+        }
+      } catch (e) {
+        console.error('Error parsing imageUrls:', e);
       }
-      product.mainImage = product.images[0]?.url || '';
     }
 
     const updatedProduct = await product.save();
@@ -269,20 +267,6 @@ export const deleteProduct = async (req, res) => {
       });
     }
 
-    // Delete images
-    const uploadDir = path.join(__dirname, '../../uploads/products');
-    for (const img of product.images) {
-      const imagePath = path.join(uploadDir, img.publicId);
-      const thumbPath = path.join(uploadDir, img.publicId.replace('.webp', '_thumb.webp'));
-      
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-      if (fs.existsSync(thumbPath)) {
-        fs.unlinkSync(thumbPath);
-      }
-    }
-
     await Product.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
@@ -305,7 +289,7 @@ export const deleteProduct = async (req, res) => {
 export const getFeaturedProducts = async (req, res) => {
   try {
     const products = await Product.find({ featured: true, isActive: true })
-      .sort({ createdAt: -1 })
+      .sort({ featured: -1, createdAt: -1 })
       .limit(8);
 
     res.status(200).json({
@@ -355,7 +339,7 @@ export const getTopSellingProducts = async (req, res) => {
   try {
     const products = await Product.find({ isActive: true })
       .sort({ soldCount: -1 })
-      .limit(10);
+      .limit(8);
 
     res.status(200).json({
       success: true,
@@ -371,13 +355,13 @@ export const getTopSellingProducts = async (req, res) => {
   }
 };
 
-// @desc    Update product stock
+// @desc    Update product stock (Admin only)
 // @route   PATCH /api/products/:id/stock
 // @access  Private/Admin
 export const updateStock = async (req, res) => {
   try {
     const { stock } = req.body;
-    
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       { stock },
