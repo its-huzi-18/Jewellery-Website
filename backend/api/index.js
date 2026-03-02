@@ -40,25 +40,6 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 404 handler
-app.use((req, res) => {
-  console.log('404 - Route not found:', req.method, req.originalUrl);
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error('Server Error:', err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
 // Vercel handler
 export const config = {
   runtime: 'nodejs',
@@ -92,6 +73,26 @@ export default async function handler(req, res) {
     app.use('/api/cart', cartRoutes);
     app.use('/api/orders', orderRoutes);
     app.use('/api/settings', settingRoutes);
+    
+    // 404 handler (MUST be after all routes)
+    app.use((req, res) => {
+      console.log('404 - Route not found:', req.method, req.originalUrl);
+      res.status(404).json({
+        success: false,
+        message: 'Route not found'
+      });
+    });
+
+    // Error handler (MUST be last)
+    app.use((err, req, res, next) => {
+      console.error('Server Error:', err.stack);
+      res.status(500).json({
+        success: false,
+        message: 'Something went wrong!',
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+      });
+    });
+    
     app._routesSetup = true;
     console.log('Routes configured');
   }
