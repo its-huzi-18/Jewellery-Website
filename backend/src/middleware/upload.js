@@ -1,28 +1,50 @@
-import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// Check if Cloudinary is configured
+const isCloudinaryConfigured = () => {
+  return !!(process.env.CLOUDINARY_CLOUD_NAME && 
+            process.env.CLOUDINARY_API_KEY && 
+            process.env.CLOUDINARY_API_SECRET);
+};
 
-// Configure Cloudinary storage
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'jewellery-products',
-    allowed_formats: ['jpeg', 'jpg', 'png', 'gif', 'webp'],
-    transformation: [
-      { width: 800, height: 800, crop: 'limit', quality: 'auto:good' },
-      { fetch_format: 'auto' }
-    ],
-    public_id: () => uuidv4()
+// Lazy load Cloudinary only when configured
+let cloudinary = null;
+let CloudinaryStorage = null;
+
+const initCloudinary = () => {
+  if (!cloudinary && isCloudinaryConfigured()) {
+    const cloudinaryModule = require('cloudinary').v2;
+    cloudinaryModule.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+    cloudinary = cloudinaryModule;
+    CloudinaryStorage = require('multer-storage-cloudinary').CloudinaryStorage;
   }
-});
+  return cloudinary !== null;
+};
+
+// Get storage configuration
+const getStorage = () => {
+  if (initCloudinary()) {
+    return new CloudinaryStorage({
+      cloudinary: cloudinary,
+      params: {
+        folder: 'jewellery-products',
+        allowed_formats: ['jpeg', 'jpg', 'png', 'gif', 'webp'],
+        transformation: [
+          { width: 800, height: 800, crop: 'limit', quality: 'auto:good' },
+          { fetch_format: 'auto' }
+        ],
+        public_id: () => uuidv4()
+      }
+    });
+  }
+  // Fallback to memory storage
+  return multer.memoryStorage();
+};
 
 // File filter for images only
 const fileFilter = (req, file, cb) => {
@@ -39,15 +61,25 @@ const fileFilter = (req, file, cb) => {
 
 // Configure multer
 export const upload = multer({
-  storage,
+  storage: getStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
   },
   fileFilter
 });
 
-// Image processing with Cloudinary (handled automatically)
+// Image processing
 export const processImage = async (file) => {
+  if (!isCloudinaryConfigured()) {
+    console.warn('Cloudinary not configured - returning file info');
+    // For memory storage, file is a buffer - return basic info
+    return {
+      url: file.path || 'https://via.placeholder.com/800x800?text=Product+Image',
+      publicId: file.filename || 'placeholder',
+      thumbnailUrl: file.path || 'https://via.placeholder.com/300x300?text=Product+Image'
+    };
+  }
+
   try {
     // Cloudinary already processed the image during upload
     return {
@@ -86,46 +118,4 @@ export const handleMulterError = (err, req, res, next) => {
     });
   }
   next();
-};
-
-// Cloudinary utility functions
-export const uploadToCloudinary = async (fileBuffer, folder = 'jewellery-products') => {
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
-      {
-        folder,
-        resource_type: 'image',
-        transformation: [
-          { width: 800, height: 800, crop: 'limit', quality: 'auto:good' }
-        ]
-      },
-      (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve({
-            url: result.secure_url,
-            publicId: result.public_id,
-            thumbnailUrl: cloudinary.url(result.public_id, {
-              transformation: [
-                { width: 300, height: 300, crop: 'fill' },
-                { quality: 'auto:good' }
-              ]
-            })
-          });
-        }
-      }
-    ).end(fileBuffer);
-  });
-};
-
-// Delete image from Cloudinary
-export const deleteFromCloudinary = async (publicId) => {
-  try {
-    const result = await cloudinary.uploader.destroy(publicId);
-    return result;
-  } catch (error) {
-    console.error('Delete image error:', error);
-    throw error;
-  }
 };
