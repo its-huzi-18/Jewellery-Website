@@ -20,12 +20,28 @@ app.use((req, res, next) => {
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'https://jewellery-website-*.vercel.app',  // Vercel frontend
-    process.env.FRONTEND_URL || '*'
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    // Allowed origins
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173',
+      process.env.FRONTEND_URL
+    ];
+    
+    // Check if origin matches allowed patterns
+    if (allowedOrigins.includes(origin) || 
+        origin.includes('jewellery-website') && origin.includes('vercel.app') ||
+        origin.includes('jewellery-website') && origin.includes('netlify.app')) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
