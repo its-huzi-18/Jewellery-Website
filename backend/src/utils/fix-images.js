@@ -4,8 +4,8 @@ import Product from '../models/Product.js';
 
 dotenv.config();
 
-// Placeholder images from Unsplash for jewelry
-const placeholderImages = {
+// Working Unsplash images by category
+const categoryImages = {
   rings: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&h=800&fit=crop',
   bracelets: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&h=800&fit=crop',
   necklaces: 'https://images.unsplash.com/photo-1599643478518-17488fbbcd75?w=800&h=800&fit=crop',
@@ -16,7 +16,7 @@ const placeholderImages = {
   bestsellers: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=800&fit=crop'
 };
 
-const fixProductImages = async () => {
+const fixAllImages = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ MongoDB Connected');
@@ -25,47 +25,31 @@ const fixProductImages = async () => {
     console.log(`Found ${products.length} products`);
 
     let updated = 0;
-    let failed = 0;
 
     for (const product of products) {
-      const hasBrokenImages = 
-        !product.mainImage || 
-        product.mainImage.includes('/uploads/') ||
-        product.mainImage.includes('localhost') ||
-        product.images?.some(img => img.url?.includes('/uploads/') || img.url?.includes('localhost'));
-
-      if (hasBrokenImages) {
-        // Get category-specific placeholder or use rings as default
-        const placeholderUrl = placeholderImages[product.category] || placeholderImages.rings;
+      const newImage = categoryImages[product.category] || categoryImages.rings;
+      
+      // Only update if different from current
+      if (product.mainImage !== newImage) {
+        product.mainImage = newImage;
+        product.images = [{ url: newImage, publicId: '' }];
         
-        // Update product with placeholder image
-        product.mainImage = placeholderUrl;
-        product.images = [{ url: placeholderUrl, publicId: '' }];
-        
-        try {
-          await product.save();
-          console.log(`✅ Updated: ${product.title}`);
-          updated++;
-        } catch (error) {
-          console.error(`❌ Failed to update ${product.title}:`, error.message);
-          failed++;
-        }
+        await product.save();
+        console.log(`✅ ${product.category}: ${product.title}`);
+        updated++;
       } else {
-        console.log(`⏭️  Skipped: ${product.title} (images OK)`);
+        console.log(`⏭️  ${product.category}: ${product.title} (already updated)`);
       }
     }
 
-    console.log(`\n📊 Summary:`);
-    console.log(`   Updated: ${updated}`);
-    console.log(`   Failed: ${failed}`);
-    console.log(`   Skipped: ${products.length - updated - failed}`);
+    console.log(`\n📊 Updated: ${updated} products`);
 
     await mongoose.disconnect();
-    console.log('\n✅ Done!');
+    console.log('\n✅ All products now have working images!');
   } catch (error) {
     console.error('❌ Error:', error.message);
     process.exit(1);
   }
 };
 
-fixProductImages();
+fixAllImages();
