@@ -3,14 +3,14 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/src/server.js"
+      "destination": "/api/index.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
   },
   "functions": {
-    "src/server.js": {
+    "api/index.js": {
       "maxDuration": 10
     }
   }

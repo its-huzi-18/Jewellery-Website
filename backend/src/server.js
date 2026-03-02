@@ -72,15 +72,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Vercel serverless function handler
-export const handler = async (req, res) => {
-  try {
-    await connectDB();
-  } catch (err) {
-    console.error('DB connection error in handler:', err);
-  }
-  app(req, res);
-};
-
-// Vercel export - no listen() for serverless
+// Export app for Vercel
 export default app;
