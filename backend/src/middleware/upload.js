@@ -1,13 +1,13 @@
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from 'cloudinary';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 // Configure Cloudinary
-cloudinary.config({
+cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
@@ -24,7 +24,7 @@ const storage = multer.memoryStorage();
 
 // Cloudinary storage for production
 const cloudinaryStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary: cloudinary.v2,
   params: {
     folder: 'jewellery-products',
     allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
@@ -90,7 +90,7 @@ export const handleMulterError = (err, req, res, next) => {
 // Cloudinary upload helper
 export const uploadToCloudinary = async (file) => {
   return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
+    const uploadStream = cloudinary.v2.uploader.upload_stream(
       {
         folder: 'jewellery-products',
         resource_type: 'image'
@@ -110,7 +110,7 @@ export const uploadToCloudinary = async (file) => {
 // Cloudinary delete helper
 export const deleteFromCloudinary = async (publicId) => {
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.destroy(publicId, (error, result) => {
+    cloudinary.v2.uploader.destroy(publicId, (error, result) => {
       if (error) return reject(error);
       resolve(result);
     });
