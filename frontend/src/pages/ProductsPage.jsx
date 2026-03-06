@@ -42,7 +42,11 @@ const ProductsPage = () => {
       setLoading(true);
       try {
         const params = {
-          ...filters,
+          category: searchParams.get('category') || '',
+          search: searchParams.get('search') || '',
+          minPrice: searchParams.get('minPrice') || '',
+          maxPrice: searchParams.get('maxPrice') || '',
+          sort: searchParams.get('sort') || 'newest',
           page: searchParams.get('page') || 1,
           limit: 12
         };
@@ -55,6 +59,15 @@ const ProductsPage = () => {
         const { data } = await productAPI.getProducts(params);
         setProducts(data.data.products);
         setPagination(data.data.pagination);
+        
+        // Update filters state to match URL
+        setFilters({
+          category: params.category || '',
+          search: params.search || '',
+          minPrice: params.minPrice || '',
+          maxPrice: params.maxPrice || '',
+          sort: params.sort || 'newest'
+        });
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
