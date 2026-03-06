@@ -53,12 +53,24 @@ export const productAPI = {
   getFeatured: () => api.get('/products/featured'),
   getTopSelling: () => api.get('/products/top-selling'),
   getByCategory: (category) => api.get(`/products/category/${category}`),
-  createProduct: (data) => api.post('/products', data, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
-  updateProduct: (id, data) => api.put(`/products/${id}`, data, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
+  createProduct: (data) => {
+    // Don't set Content-Type header - axios will set it automatically with boundary for FormData
+    const token = localStorage.getItem('token');
+    return api.post('/products', data, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : undefined
+      }
+    });
+  },
+  updateProduct: (id, data) => {
+    // Don't set Content-Type header - axios will set it automatically with boundary for FormData
+    const token = localStorage.getItem('token');
+    return api.put(`/products/${id}`, data, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : undefined
+      }
+    });
+  },
   deleteProduct: (id) => api.delete(`/products/${id}`)
 };
 

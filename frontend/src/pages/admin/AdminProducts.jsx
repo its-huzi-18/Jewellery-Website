@@ -89,7 +89,7 @@ const AdminProducts = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const submitData = new FormData();
     submitData.append('title', formData.title);
     submitData.append('description', formData.description);
@@ -114,7 +114,20 @@ const AdminProducts = () => {
       handleCloseModal();
       fetchProducts();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to save product');
+      console.error('Product save error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      let errorMessage = 'Failed to save product';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.status === 413) {
+        errorMessage = 'Image size too large. Maximum size is 5MB';
+      } else if (error.code === 'ERR_NETWORK') {
+        errorMessage = 'Network error. Please check your connection.';
+      }
+      
+      toast.error(errorMessage);
     }
   };
 
