@@ -221,15 +221,22 @@ const AdminProducts = () => {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product) => {
+                const displayImage = product.mainImage || 
+                  `https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=200&h=200&fit=crop`;
+                
+                return (
                 <tr key={product._id} className="hover:bg-black-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-black-100">
+                      <div className="w-12 h-12 bg-black-100 rounded overflow-hidden flex-shrink-0">
                         <img
-                          src={product.mainImage}
+                          src={displayImage}
                           alt={product.title}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=200&h=200&fit=crop';
+                          }}
                         />
                       </div>
                       <div>
@@ -299,7 +306,8 @@ const AdminProducts = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>
