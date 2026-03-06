@@ -89,6 +89,16 @@ export const processImage = async (file) => {
 
 // Error handler for multer
 export const handleMulterError = (err, req, res, next) => {
+  console.log('=== Multer Error Handler ===');
+  console.log('Error present:', !!err);
+  if (err) {
+    console.log('Error name:', err.name);
+    console.log('Error message:', err.message);
+    console.log('Error stack:', err.stack);
+  }
+  console.log('Request files:', req.files?.length || 0);
+  console.log('===========================');
+  
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
