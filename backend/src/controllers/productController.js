@@ -1,5 +1,63 @@
 import Product from '../models/Product.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../middleware/upload.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Check if Cloudinary is configured
+const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
+                               process.env.CLOUDINARY_API_KEY && 
+                               process.env.CLOUDINARY_API_SECRET;
+
+// Helper function to save image to disk (for local development without Cloudinary)
+const saveImageToDisk = (file) => {
+  const uploadDir = path.join(__dirname, '../../uploads');
+  
+  // Create uploads directory if it doesn't exist
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+  const ext = path.extname(file.originalname) || '.jpg';
+  const filename = `product-${uniqueSuffix}${ext}`;
+  const filepath = path.join(uploadDir, filename);
+
+  fs.writeFileSync(filepath, file.buffer);
+  
+  // Return the URL path (relative to server root)
+  return `/uploads/${filename}`;
+};
+
+// Helper function to process uploaded images
+const processUploadedImages = async (files) => {
+  if (!files || files.length === 0) return { images: [], mainImage: '' };
+
+  let images = [];
+  
+  if (isCloudinaryConfigured) {
+    // Upload to Cloudinary
+    for (const file of files) {
+      const result = await uploadToCloudinary(file);
+      images.push({ url: result.url, publicId: result.publicId });
+    }
+  } else {
+    // Save to disk
+    for (const file of files) {
+      const imageUrl = saveImageToDisk(file);
+      images.push({ url: imageUrl, publicId: '' });
+    }
+  }
+  
+  const mainImage = images[0]?.url || '';
+  return { images, mainImage };
+};
 
 // @desc    Get all products with filtering, sorting, pagination
 // @route   GET /api/products
@@ -141,11 +199,17 @@ export const createProduct = async (req, res) => {
       imageUrls
     } = req.body;
 
-    // Parse imageUrls if it's a string
+    // Process uploaded images
     let images = [];
     let mainImage = '';
 
-    if (imageUrls) {
+    // Handle file uploads from req.files
+    if (req.files && req.files.length > 0) {
+      const result = await processUploadedImages(req.files);
+      images = result.images;
+      mainImage = result.mainImage;
+    } else if (imageUrls) {
+      // Fallback to imageUrls from body (for backward compatibility)
       try {
         const parsedUrls = typeof imageUrls === 'string' ? JSON.parse(imageUrls) : imageUrls;
         if (Array.isArray(parsedUrls)) {
@@ -223,8 +287,13 @@ export const updateProduct = async (req, res) => {
     if (isActive !== undefined) product.isActive = isActive;
     if (specifications) product.specifications = specifications;
 
-    // Update images if provided
-    if (imageUrls) {
+    // Update images if files are uploaded
+    if (req.files && req.files.length > 0) {
+      const result = await processUploadedImages(req.files);
+      product.images = result.images;
+      product.mainImage = result.mainImage;
+    } else if (imageUrls) {
+      // Fallback to imageUrls from body (for backward compatibility)
       try {
         const parsedUrls = typeof imageUrls === 'string' ? JSON.parse(imageUrls) : imageUrls;
         if (Array.isArray(parsedUrls)) {

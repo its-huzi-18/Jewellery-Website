@@ -1,9 +1,36 @@
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Check if Cloudinary is configured
+const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
+                               process.env.CLOUDINARY_API_KEY && 
+                               process.env.CLOUDINARY_API_SECRET;
 
 // Simple memory storage - works everywhere including Vercel
 // Updated: 2026-03-02 - Fixed for ES modules
 const storage = multer.memoryStorage();
+
+// Cloudinary storage for production
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'jewellery-products',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [{ quality: 'auto', fetch_format: 'auto' }]
+  }
+});
 
 // File filter for images only
 const fileFilter = (req, file, cb) => {
@@ -18,14 +45,16 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer
-export const upload = multer({
-  storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  },
-  fileFilter
-});
+// Configure multer - use Cloudinary if configured, otherwise memory storage
+export const upload = isCloudinaryConfigured 
+  ? multer({ storage: cloudinaryStorage, limits: { fileSize: 5 * 1024 * 1024 } })
+  : multer({
+      storage,
+      limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+      },
+      fileFilter
+    });
 
 // Image processing - returns file info
 export const processImage = async (file) => {
@@ -58,11 +87,32 @@ export const handleMulterError = (err, req, res, next) => {
   next();
 };
 
-// Placeholder functions for Cloudinary (to be implemented)
-export const uploadToCloudinary = async () => {
-  throw new Error('Cloudinary upload not implemented yet');
+// Cloudinary upload helper
+export const uploadToCloudinary = async (file) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'jewellery-products',
+        resource_type: 'image'
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id
+        });
+      }
+    );
+    uploadStream.end(file.buffer);
+  });
 };
 
-export const deleteFromCloudinary = async () => {
-  throw new Error('Cloudinary delete not implemented yet');
+// Cloudinary delete helper
+export const deleteFromCloudinary = async (publicId) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(publicId, (error, result) => {
+      if (error) return reject(error);
+      resolve(result);
+    });
+  });
 };
