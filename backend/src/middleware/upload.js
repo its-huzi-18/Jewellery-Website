@@ -6,17 +6,28 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Configure Cloudinary
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// Support both CLOUDINARY_URL and separate credentials
+let isCloudinaryConfigured = false;
 
-// Check if Cloudinary is configured
-const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
-                               process.env.CLOUDINARY_API_KEY && 
-                               process.env.CLOUDINARY_API_SECRET;
+if (process.env.CLOUDINARY_URL) {
+  // CLOUDINARY_URL format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+  cloudinary.v2.config({
+    cloudinary_url: process.env.CLOUDINARY_URL
+  });
+  isCloudinaryConfigured = true;
+  console.log('Cloudinary configured using CLOUDINARY_URL');
+} else if (process.env.CLOUDINARY_CLOUD_NAME && 
+           process.env.CLOUDINARY_API_KEY && 
+           process.env.CLOUDINARY_API_SECRET) {
+  // Separate credentials format
+  cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+  isCloudinaryConfigured = true;
+  console.log('Cloudinary configured using separate credentials');
+}
 
 // Log Cloudinary status
 console.log('=== Cloudinary Configuration Status ===');
@@ -25,6 +36,7 @@ if (!isCloudinaryConfigured) {
   console.warn('WARNING: Cloudinary credentials not found. Image uploads will NOT work in production (Vercel).');
   console.warn('For local development, images will be saved to disk.');
   console.warn('For Vercel deployment, you MUST add Cloudinary environment variables.');
+  console.warn('Add either CLOUDINARY_URL or all three: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET');
 }
 console.log('======================================');
 
