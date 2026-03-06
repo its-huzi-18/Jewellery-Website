@@ -187,6 +187,11 @@ export const getProduct = async (req, res) => {
 // @access  Private/Admin
 export const createProduct = async (req, res) => {
   try {
+    console.log('=== Create Product Request ===');
+    console.log('Body:', req.body);
+    console.log('Files:', req.files);
+    console.log('Files count:', req.files?.length || 0);
+    
     const {
       title,
       description,
@@ -205,9 +210,11 @@ export const createProduct = async (req, res) => {
 
     // Handle file uploads from req.files
     if (req.files && req.files.length > 0) {
+      console.log('Processing', req.files.length, 'uploaded files...');
       const result = await processUploadedImages(req.files);
       images = result.images;
       mainImage = result.mainImage;
+      console.log('Processed images:', images);
     } else if (imageUrls) {
       // Fallback to imageUrls from body (for backward compatibility)
       try {
@@ -219,6 +226,8 @@ export const createProduct = async (req, res) => {
       } catch (e) {
         console.error('Error parsing imageUrls:', e);
       }
+    } else {
+      console.warn('No images provided for product');
     }
 
     const product = await Product.create({
@@ -234,6 +243,7 @@ export const createProduct = async (req, res) => {
       specifications: specifications || []
     });
 
+    console.log('Product created successfully:', product._id);
     res.status(201).json({
       success: true,
       message: 'Product created successfully',

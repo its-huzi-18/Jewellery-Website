@@ -18,6 +18,16 @@ const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME &&
                                process.env.CLOUDINARY_API_KEY && 
                                process.env.CLOUDINARY_API_SECRET;
 
+// Log Cloudinary status
+console.log('=== Cloudinary Configuration Status ===');
+console.log('Cloudinary configured:', isCloudinaryConfigured);
+if (!isCloudinaryConfigured) {
+  console.warn('WARNING: Cloudinary credentials not found. Image uploads will NOT work in production (Vercel).');
+  console.warn('For local development, images will be saved to disk.');
+  console.warn('For Vercel deployment, you MUST add Cloudinary environment variables.');
+}
+console.log('======================================');
+
 // Simple memory storage - works everywhere including Vercel
 // Updated: 2026-03-02 - Fixed for ES modules
 const storage = multer.memoryStorage();
