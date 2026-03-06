@@ -1,7 +1,7 @@
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -16,8 +16,8 @@ if (process.env.CLOUDINARY_URL) {
   });
   isCloudinaryConfigured = true;
   console.log('Cloudinary configured using CLOUDINARY_URL');
-} else if (process.env.CLOUDINARY_CLOUD_NAME && 
-           process.env.CLOUDINARY_API_KEY && 
+} else if (process.env.CLOUDINARY_CLOUD_NAME &&
+           process.env.CLOUDINARY_API_KEY &&
            process.env.CLOUDINARY_API_SECRET) {
   // Separate credentials format
   cloudinary.v2.config({
@@ -40,28 +40,8 @@ if (!isCloudinaryConfigured) {
 }
 console.log('======================================');
 
-// Simple memory storage - works everywhere including Vercel
-// Updated: 2026-03-02 - Fixed for ES modules
+// Simple memory storage - stores files in memory temporarily
 const storage = multer.memoryStorage();
-
-// Cloudinary storage for production
-const cloudinaryStorage = new CloudinaryStorage({
-  cloudinary: cloudinary.v2,
-  params: async (req, file) => {
-    console.log('=== Cloudinary Storage Params ===');
-    console.log('File received:', file.originalname, file.size, file.mimetype);
-    console.log('File buffer exists:', !!file.buffer);
-    console.log('File buffer size:', file.buffer?.length || 0);
-    console.log('===============================');
-    
-    return {
-      folder: 'jewellery-products',
-      allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-      resource_type: 'image',
-      transformation: [{ quality: 'auto', fetch_format: 'auto' }]
-    };
-  }
-});
 
 // File filter for images only
 const fileFilter = (req, file, cb) => {
@@ -76,21 +56,15 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer - ALWAYS use Cloudinary storage when configured
-// This ensures files are properly handled
-export const upload = isCloudinaryConfigured 
-  ? multer({ 
-      storage: cloudinaryStorage, 
-      limits: { fileSize: 5 * 1024 * 1024 },
-      fileFilter
-    })
-  : multer({
-      storage,
-      limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
-      },
-      fileFilter
-    });
+// Configure multer to use memory storage
+// Files will be uploaded to Cloudinary manually in the controller
+export const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter
+});
 
 // Image processing - returns file info
 export const processImage = async (file) => {
@@ -135,20 +109,39 @@ export const handleMulterError = (err, req, res, next) => {
 
 // Cloudinary upload helper
 export const uploadToCloudinary = async (file) => {
+  console.log('=== Uploading to Cloudinary ===');
+  console.log('File originalname:', file.originalname);
+  console.log('File mimetype:', file.mimetype);
+  console.log('File size:', file.size);
+  console.log('File buffer exists:', !!file.buffer);
+  console.log('File buffer length:', file.buffer?.length || 0);
+  
   return new Promise((resolve, reject) => {
+    if (!file.buffer || file.buffer.length === 0) {
+      console.error('Empty file buffer!');
+      return reject(new Error('Empty file'));
+    }
+
     const uploadStream = cloudinary.v2.uploader.upload_stream(
       {
         folder: 'jewellery-products',
-        resource_type: 'image'
+        resource_type: 'image',
+        public_id: `product-${Date.now()}-${Math.round(Math.random() * 1E9)}`
       },
       (error, result) => {
-        if (error) return reject(error);
+        if (error) {
+          console.error('Cloudinary upload error:', error);
+          return reject(error);
+        }
+        console.log('Cloudinary upload success:', result.secure_url);
         resolve({
           url: result.secure_url,
           publicId: result.public_id
         });
       }
     );
+    
+    // Write the buffer to the upload stream
     uploadStream.end(file.buffer);
   });
 };
