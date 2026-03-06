@@ -42,8 +42,8 @@ const Header = () => {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
       isScrolled 
-        ? 'bg-gradient-to-r from-gold-50 via-amber-50/95 to-gold-50 backdrop-blur-xl shadow-2xl border-b border-gold-300/50' 
-        : 'bg-gradient-to-r from-gold-50 via-amber-50 to-gold-50'
+        ? 'bg-gradient-to-r from-amber-100 via-yellow-50 to-amber-50 backdrop-blur-xl shadow-2xl border-b-2 border-gold-400/50' 
+        : 'bg-gradient-to-r from-amber-100 via-yellow-50 to-amber-50'
     }`}>
       
       {/* Top Bar - Elegant Black with Gold */}
@@ -206,7 +206,7 @@ const Header = () => {
 
       {/* Mobile Menu - Premium Design */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-gradient-to-b from-gold-50 via-amber-50 to-gold-50 border-t-2 border-gold-300 animate-slide-down shadow-2xl">
+        <div className="lg:hidden bg-gradient-to-b from-amber-100 via-yellow-50 to-amber-50 border-t-2 border-gold-400 animate-slide-down shadow-2xl">
           <div className="container-custom py-6">
             {/* Mobile Search */}
             <form onSubmit={handleSearch} className="mb-6 relative">
