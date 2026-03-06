@@ -250,11 +250,31 @@ export const createProduct = async (req, res) => {
       data: { product }
     });
   } catch (error) {
-    console.error('Create product error:', error);
+    console.error('=== Create Product ERROR ===');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Error details:', JSON.stringify(error, null, 2));
+    console.error('===========================');
+    
+    let errorMessage = 'Server error';
+    
+    // More specific error messages
+    if (error.name === 'ValidationError') {
+      errorMessage = `Validation error: ${error.message}`;
+    } else if (error.name === 'CastError') {
+      errorMessage = 'Invalid product data';
+    } else if (error.message.includes('Cloudinary')) {
+      errorMessage = `Cloudinary error: ${error.message}`;
+    } else if (error.message.includes('multer')) {
+      errorMessage = `Upload error: ${error.message}`;
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'Server error',
-      error: error.message
+      message: errorMessage,
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };
