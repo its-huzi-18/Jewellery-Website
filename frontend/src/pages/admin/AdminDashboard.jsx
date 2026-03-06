@@ -15,11 +15,11 @@ const AdminDashboard = () => {
       try {
         const [statsRes, productsRes] = await Promise.all([
           orderAPI.getStats(),
-          productAPI.getTopSelling()
+          productAPI.getProducts({ limit: 5, sort: 'newest' })
         ]);
 
         setStats(statsRes.data.data);
-        setTopProducts(productsRes.data.data.products.slice(0, 5));
+        setTopProducts(productsRes.data.data.products);
         setRecentOrders(statsRes.data.data.recentOrders);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -113,10 +113,10 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Top Selling Products */}
+        {/* Newest Products */}
         <div className="bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-serif text-xl font-semibold">Top Selling Products</h2>
+            <h2 className="font-serif text-xl font-semibold">Newest Products</h2>
             <Link to="/admin/products" className="text-gold-600 text-sm font-medium hover:underline">
               View All
             </Link>
@@ -136,7 +136,9 @@ const AdminDashboard = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-black-900 truncate">{product.title}</p>
-                  <p className="text-sm text-black-500">{product.soldCount || 0} sold</p>
+                  <p className="text-sm text-black-500">
+                    {new Date(product.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </p>
                 </div>
                 <p className="font-semibold text-gold-600">
                   Rs. {product.price.toLocaleString('en-PK')}

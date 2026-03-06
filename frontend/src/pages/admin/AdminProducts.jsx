@@ -31,7 +31,7 @@ const AdminProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await productAPI.getProducts({ limit: 100 });
+      const { data } = await productAPI.getProducts({ limit: 100, sort: 'newest' });
       setProducts(data.data.products);
     } catch (error) {
       toast.error('Failed to fetch products');
