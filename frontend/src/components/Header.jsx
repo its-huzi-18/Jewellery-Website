@@ -206,7 +206,7 @@ const Header = () => {
 
       {/* Mobile Menu - Premium Design */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gold-200 animate-slide-down shadow-2xl">
+        <div className="lg:hidden bg-gradient-to-b from-gold-50 via-amber-50 to-gold-50 border-t-2 border-gold-300 animate-slide-down shadow-2xl">
           <div className="container-custom py-6">
             {/* Mobile Search */}
             <form onSubmit={handleSearch} className="mb-6 relative">
@@ -215,9 +215,9 @@ const Header = () => {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 pl-12 bg-black-50 border border-black-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500"
+                className="w-full px-4 py-3 pl-12 bg-white/80 border-2 border-gold-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/40 focus:border-gold-400 transition-all duration-300"
               />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gold-600" />
             </form>
 
             {/* Mobile Nav Links */}
@@ -227,7 +227,7 @@ const Header = () => {
                   key={category.name}
                   to={category.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3.5 text-black-700 hover:bg-gold-50 hover:text-gold-600 rounded-xl transition-all duration-300 font-medium"
+                  className="flex items-center gap-3 px-4 py-3.5 text-black-700 hover:bg-gold-100 hover:text-gold-700 rounded-xl transition-all duration-300 font-medium border border-transparent hover:border-gold-200"
                 >
                   <span className="text-lg">{category.icon}</span>
                   <span>{category.name}</span>
@@ -236,17 +236,17 @@ const Header = () => {
             </nav>
 
             {/* Mobile User Section */}
-            <div className="pt-4 border-t border-black-100">
+            <div className="pt-4 border-t-2 border-gold-200">
               {isAuthenticated ? (
                 <>
                   {/* User Info Card */}
-                  <div className="flex items-center gap-3 px-4 py-4 mb-4 bg-gradient-to-br from-gold-50 to-gold-100/50 rounded-xl border border-gold-200">
+                  <div className="flex items-center gap-3 px-4 py-4 mb-4 bg-gradient-to-br from-gold-100 to-amber-100/60 rounded-xl border-2 border-gold-300 shadow-sm">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-lg flex-shrink-0">
                       <User className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-black-900 truncate">{user?.name}</p>
-                      <p className="text-xs text-black-500 truncate">{user?.email}</p>
+                      <p className="text-xs text-black-600 truncate">{user?.email}</p>
                     </div>
                   </div>
 
@@ -255,7 +255,7 @@ const Header = () => {
                     <Link
                       to="/account/orders"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-black-700 hover:bg-gold-50 hover:text-gold-600 rounded-xl transition-all duration-300 font-medium"
+                      className="flex items-center gap-3 px-4 py-3 text-black-700 hover:bg-gold-100 hover:text-gold-700 rounded-xl transition-all duration-300 font-medium border border-transparent hover:border-gold-200"
                     >
                       <ShoppingBag className="w-5 h-5" />
                       <span>My Orders</span>
@@ -263,7 +263,7 @@ const Header = () => {
                     <Link
                       to="/account/profile"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-black-700 hover:bg-gold-50 hover:text-gold-600 rounded-xl transition-all duration-300 font-medium"
+                      className="flex items-center gap-3 px-4 py-3 text-black-700 hover:bg-gold-100 hover:text-gold-700 rounded-xl transition-all duration-300 font-medium border border-transparent hover:border-gold-200"
                     >
                       <User className="w-5 h-5" />
                       <span>Profile</span>
@@ -272,7 +272,7 @@ const Header = () => {
                       <Link
                         to="/admin/dashboard"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-gold-600 bg-gold-50 rounded-xl transition-all duration-300 font-medium"
+                        className="flex items-center gap-3 px-4 py-3 text-gold-700 bg-gold-100 rounded-xl transition-all duration-300 font-medium border border-gold-200"
                       >
                         <LayoutDashboard className="w-5 h-5" />
                         <span>Admin Dashboard</span>
@@ -283,7 +283,7 @@ const Header = () => {
                         logout();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 font-medium"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 font-medium border border-transparent hover:border-red-200"
                     >
                       <LogOut className="w-5 h-5" />
                       <span>Logout</span>
@@ -294,7 +294,7 @@ const Header = () => {
                 <Link
                   to="/login"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-black-900 text-white font-medium rounded-xl hover:bg-gold-600 transition-all duration-300 shadow-lg"
+                  className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-gradient-to-br from-gold-500 to-gold-600 text-white font-medium rounded-xl hover:from-gold-600 hover:to-gold-700 transition-all duration-300 shadow-lg"
                 >
                   <User className="w-5 h-5" />
                   <span>Login / Register</span>
