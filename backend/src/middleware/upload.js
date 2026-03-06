@@ -47,10 +47,19 @@ const storage = multer.memoryStorage();
 // Cloudinary storage for production
 const cloudinaryStorage = new CloudinaryStorage({
   cloudinary: cloudinary.v2,
-  params: {
-    folder: 'jewellery-products',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-    transformation: [{ quality: 'auto', fetch_format: 'auto' }]
+  params: async (req, file) => {
+    console.log('=== Cloudinary Storage Params ===');
+    console.log('File received:', file.originalname, file.size, file.mimetype);
+    console.log('File buffer exists:', !!file.buffer);
+    console.log('File buffer size:', file.buffer?.length || 0);
+    console.log('===============================');
+    
+    return {
+      folder: 'jewellery-products',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+      resource_type: 'image',
+      transformation: [{ quality: 'auto', fetch_format: 'auto' }]
+    };
   }
 });
 
@@ -67,9 +76,14 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer - use Cloudinary if configured, otherwise memory storage
+// Configure multer - ALWAYS use Cloudinary storage when configured
+// This ensures files are properly handled
 export const upload = isCloudinaryConfigured 
-  ? multer({ storage: cloudinaryStorage, limits: { fileSize: 5 * 1024 * 1024 } })
+  ? multer({ 
+      storage: cloudinaryStorage, 
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter
+    })
   : multer({
       storage,
       limits: {

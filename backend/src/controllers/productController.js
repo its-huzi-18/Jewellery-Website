@@ -192,6 +192,18 @@ export const createProduct = async (req, res) => {
     console.log('Files:', req.files);
     console.log('Files count:', req.files?.length || 0);
     
+    if (req.files && req.files.length > 0) {
+      req.files.forEach((file, index) => {
+        console.log(`File ${index + 1}:`);
+        console.log('  - Original name:', file.originalname);
+        console.log('  - Mimetype:', file.mimetype);
+        console.log('  - Size:', file.size);
+        console.log('  - Buffer exists:', !!file.buffer);
+        console.log('  - Buffer size:', file.buffer?.length || 0);
+        console.log('  - Cloudinary info:', file.path || file.location || 'Not uploaded yet');
+      });
+    }
+    
     const {
       title,
       description,
@@ -268,6 +280,8 @@ export const createProduct = async (req, res) => {
       errorMessage = `Cloudinary error: ${error.message}`;
     } else if (error.message.includes('multer')) {
       errorMessage = `Upload error: ${error.message}`;
+    } else if (error.message.includes('Empty file')) {
+      errorMessage = 'Empty file received. Please try a different image file.';
     }
     
     res.status(500).json({
