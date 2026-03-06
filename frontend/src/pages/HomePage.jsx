@@ -98,25 +98,31 @@ const HomePage = () => {
             <div className="order-1 lg:order-2 relative">
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop',
-                  'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop',
-                  'https://images.unsplash.com/photo-1598560916717-52f0e6d501f7?w=400&h=500&fit=crop',
-                  'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop',
-                  'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop',
-                  'https://images.unsplash.com/photo-1598560916717-52f0e6d501f7?w=400&h=500&fit=crop'
+                  'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop&q=80',
+                  'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80',
+                  'https://images.unsplash.com/photo-1598560916717-52f0e6d501f7?w=400&h=500&fit=crop&q=80',
+                  'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop&q=80',
+                  'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80',
+                  'https://images.unsplash.com/photo-1598560916717-52f0e6d501f7?w=400&h=500&fit=crop&q=80'
                 ].map((img, index) => (
-                  <div
+                  <Link
                     key={index}
-                    className={`relative overflow-hidden rounded-lg ${
+                    to="/products?category=rings"
+                    className={`relative overflow-hidden rounded-lg cursor-pointer group ${
                       index === 0 || index === 5 ? 'row-span-2' : ''
                     }`}
                   >
                     <img
                       src={img}
                       alt={`Ring ${index + 1}`}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.src = 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop';
+                      }}
                     />
-                  </div>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                  </Link>
                 ))}
               </div>
             </div>
