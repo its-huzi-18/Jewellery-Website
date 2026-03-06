@@ -42,8 +42,8 @@ const Header = () => {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
       isScrolled 
-        ? 'bg-white/95 backdrop-blur-xl shadow-2xl border-b border-gold-200/50' 
-        : 'bg-white'
+        ? 'bg-gradient-to-r from-gold-50 via-amber-50/95 to-gold-50 backdrop-blur-xl shadow-2xl border-b border-gold-300/50' 
+        : 'bg-gradient-to-r from-gold-50 via-amber-50 to-gold-50'
     }`}>
       
       {/* Top Bar - Elegant Black with Gold */}
@@ -88,8 +88,8 @@ const Header = () => {
                   to={category.path}
                   className={`px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg relative ${
                     hoveredCategory === category.name
-                      ? 'text-gold-600 bg-gold-50'
-                      : 'text-black-700 hover:text-black-900'
+                      ? 'text-gold-700 bg-gold-100'
+                      : 'text-black-700 hover:text-gold-700'
                   }`}
                 >
                   {category.name}
@@ -111,20 +111,20 @@ const Header = () => {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48 lg:w-64 px-4 py-2.5 pl-11 bg-black-50 border border-black-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500/50 transition-all duration-300 group-hover:bg-white group-hover:shadow-lg"
+                className="w-48 lg:w-64 px-4 py-2.5 pl-11 bg-white/70 border border-gold-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/30 focus:border-gold-500/60 transition-all duration-300 group-hover:bg-white group-hover:shadow-lg placeholder-black-400"
               />
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-black-400 group-hover:text-gold-600 transition-colors" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gold-600" />
             </form>
 
             {/* Actions Icons */}
             <div className="flex items-center gap-1">
               {/* Wishlist */}
-              <button className="relative p-3 text-black-600 hover:text-gold-600 hover:bg-gold-50 rounded-full transition-all duration-300 group">
+              <button className="relative p-3 text-black-700 hover:text-gold-700 hover:bg-gold-100/70 rounded-full transition-all duration-300 group">
                 <Heart className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </button>
 
               {/* Cart with Badge */}
-              <Link to="/cart" className="relative p-3 text-black-600 hover:text-gold-600 hover:bg-gold-50 rounded-full transition-all duration-300 group">
+              <Link to="/cart" className="relative p-3 text-black-700 hover:text-gold-700 hover:bg-gold-100/70 rounded-full transition-all duration-300 group">
                 <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 {cartCount > 0 && (
                   <span className="absolute top-1.5 right-1.5 bg-gradient-to-br from-gold-500 to-gold-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center shadow-lg font-bold ring-2 ring-white">
@@ -136,15 +136,15 @@ const Header = () => {
               {/* User Menu - Premium Design */}
               {isAuthenticated && user ? (
                 <div className="relative group ml-2">
-                  <button className="flex items-center gap-2 p-1.5 pr-3 bg-black-50 hover:bg-gold-50 rounded-full transition-all duration-300 border border-black-100 hover:border-gold-300">
+                  <button className="flex items-center gap-2 p-1.5 pr-3 bg-white/80 hover:bg-gold-100/70 rounded-full transition-all duration-300 border border-gold-200 hover:border-gold-400 shadow-sm">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 flex items-center justify-center shadow-md ring-2 ring-white">
                       <User className="w-4 h-4 text-white" />
                     </div>
-                    <ChevronDown className="w-4 h-4 text-black-600 group-hover:text-gold-600 transition-colors" />
+                    <ChevronDown className="w-4 h-4 text-black-700 group-hover:text-gold-700 transition-colors" />
                   </button>
 
                   {/* Premium Dropdown */}
-                  <div className="absolute right-0 mt-2 w-72 bg-white shadow-2xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden border border-gold-100">
+                  <div className="absolute right-0 mt-2 w-72 bg-white shadow-2xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden border-2 border-gold-200">
                     {/* User Header */}
                     <div className="bg-gradient-to-br from-gold-500 to-gold-600 px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -161,20 +161,20 @@ const Header = () => {
                     {/* Menu Items */}
                     <div className="py-2">
                       {isAdmin && (
-                        <Link to="/admin/dashboard" className="flex items-center gap-3 px-6 py-3 text-sm text-black-700 hover:bg-gold-50 hover:text-gold-600 transition-colors">
+                        <Link to="/admin/dashboard" className="flex items-center gap-3 px-6 py-3 text-sm text-black-700 hover:bg-gold-50 hover:text-gold-700 transition-colors">
                           <LayoutDashboard className="w-4 h-4" />
                           <span>Admin Dashboard</span>
                         </Link>
                       )}
-                      <Link to="/account/orders" className="flex items-center gap-3 px-6 py-3 text-sm text-black-700 hover:bg-gold-50 hover:text-gold-600 transition-colors">
+                      <Link to="/account/orders" className="flex items-center gap-3 px-6 py-3 text-sm text-black-700 hover:bg-gold-50 hover:text-gold-700 transition-colors">
                         <ShoppingBag className="w-4 h-4" />
                         <span>My Orders</span>
                       </Link>
-                      <Link to="/account/profile" className="flex items-center gap-3 px-6 py-3 text-sm text-black-700 hover:bg-gold-50 hover:text-gold-600 transition-colors">
+                      <Link to="/account/profile" className="flex items-center gap-3 px-6 py-3 text-sm text-black-700 hover:bg-gold-50 hover:text-gold-700 transition-colors">
                         <User className="w-4 h-4" />
                         <span>Profile</span>
                       </Link>
-                      <hr className="my-2 border-black-100" />
+                      <hr className="my-2 border-gold-200" />
                       <button onClick={logout} className="w-full flex items-center gap-3 px-6 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors">
                         <LogOut className="w-4 h-4" />
                         <span>Logout</span>
@@ -183,7 +183,7 @@ const Header = () => {
                   </div>
                 </div>
               ) : (
-                <Link to="/login" className="px-5 py-2.5 bg-black-900 text-white text-sm font-medium rounded-full hover:bg-gold-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                <Link to="/login" className="px-5 py-2.5 bg-gradient-to-br from-gold-500 to-gold-600 text-white text-sm font-medium rounded-full hover:from-gold-600 hover:to-gold-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
                   Login
                 </Link>
               )}
@@ -191,7 +191,7 @@ const Header = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2.5 text-black-600 hover:bg-black-50 rounded-lg transition-colors"
+                className="lg:hidden p-2.5 text-black-700 hover:bg-gold-100/70 rounded-lg transition-colors"
               >
                 {isMobileMenuOpen ? (
                   <X className="w-6 h-6" />
