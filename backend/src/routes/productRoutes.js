@@ -22,6 +22,18 @@ router.get('/top-selling', getTopSellingProducts);
 router.get('/category/:category', getProductsByCategory);
 router.get('/:id', getProduct);
 
+// Debug route - test Cloudinary configuration
+router.get('/test-upload', (req, res) => {
+  const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_URL;
+  res.json({
+    success: true,
+    cloudinaryConfigured: !!isCloudinaryConfigured,
+    hasCloudName: !!process.env.CLOUDINARY_CLOUD_NAME,
+    hasCloudinaryUrl: !!process.env.CLOUDINARY_URL,
+    message: isCloudinaryConfigured ? 'Cloudinary is configured' : 'Cloudinary NOT configured'
+  });
+});
+
 // Protected routes (Admin only)
 router.post('/', protect, authorize('admin'), upload.array('images', 5), handleMulterError, createProduct);
 router.put('/:id', protect, authorize('admin'), upload.array('images', 5), handleMulterError, updateProduct);
