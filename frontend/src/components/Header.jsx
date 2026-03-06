@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, User, Search, Menu, X, Heart, LogOut, LayoutDashboard } from 'lucide-react';
+import { ShoppingBag, User, Search, Menu, X, Heart, LogOut, LayoutDashboard, ChevronDown, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 
@@ -8,14 +8,15 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+
   const { isAuthenticated, user, isAdmin, logout } = useAuth();
   const { cartCount } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -29,245 +30,252 @@ const Header = () => {
     }
   };
 
-  const navLinks = [
-    { name: 'Rings', path: '/products?category=rings' },
-    { name: 'Bracelets', path: '/products?category=bracelets' },
-    { name: 'Necklaces', path: '/products?category=necklaces' },
-    { name: 'Earrings', path: '/products?category=earrings' },
-    { name: 'Charms', path: '/products?category=charms' },
-    { name: 'Gifts', path: '/products?category=gifts' }
+  const categories = [
+    { name: 'Rings', path: '/products?category=rings', icon: '💍' },
+    { name: 'Bracelets', path: '/products?category=bracelets', icon: '📿' },
+    { name: 'Necklaces', path: '/products?category=necklaces', icon: '📿' },
+    { name: 'Earrings', path: '/products?category=earrings', icon: '✨' },
+    { name: 'Charms', path: '/products?category=charms', icon: '🎁' },
+    { name: 'Gifts', path: '/products?category=gifts', icon: '🎁' }
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white/98 backdrop-blur-md shadow-lg' : 'bg-white'
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      isScrolled 
+        ? 'bg-white/95 backdrop-blur-xl shadow-2xl border-b border-gold-200/50' 
+        : 'bg-white'
     }`}>
-      {/* Top bar - Black with Gold text */}
-      <div className="bg-gradient-to-r from-black-900 via-black-800 to-black-900 text-gold-300 text-xs py-2.5 text-center border-b border-gold-600/20">
-        <p className="flex items-center justify-center gap-2">
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
-          </svg>
-          <span>Free shipping on all orders over Rs. 15,000</span>
+      
+      {/* Top Bar - Elegant Black with Gold */}
+      <div className="bg-gradient-to-r from-black-900 via-black-800 to-black-900 text-white text-xs py-2 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+        <p className="flex items-center justify-center gap-2 relative z-10 tracking-wide">
+          <Sparkles className="w-3.5 h-3.5 text-gold-400" />
+          <span className="font-light">Free shipping on orders over <span className="font-semibold text-gold-300">Rs. 15,000</span></span>
+          <Sparkles className="w-3.5 h-3.5 text-gold-400" />
         </p>
       </div>
 
-      {/* Main header */}
+      {/* Main Header */}
       <div className="container-custom">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
+          
+          {/* Logo - Enhanced */}
           <Link to="/" className="flex-shrink-0 group">
-            <div className="bg-gradient-to-br from-black-900 via-black-800 to-gold-700 bg-clip-text">
-              <h1 className="font-serif text-2xl md:text-3xl font-bold text-transparent bg-clip-text tracking-wider group-hover:opacity-80 transition-opacity">
-                BLACK <span className="text-gold-600">&</span> GOLD
-              </h1>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                <span className="text-white font-bold text-lg">B</span>
+              </div>
+              <div>
+                <h1 className="font-serif text-xl md:text-2xl font-bold text-black-900 tracking-tight">
+                  BLACK <span className="text-gold-600">&</span> GOLD
+                </h1>
+                <p className="text-xs text-black-500 tracking-widest uppercase -mt-1">Jewellery</p>
+              </div>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className="nav-link"
+          {/* Desktop Navigation - Professional Layout */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {categories.map((category) => (
+              <div
+                key={category.name}
+                className="relative group"
+                onMouseEnter={() => setHoveredCategory(category.name)}
+                onMouseLeave={() => setHoveredCategory(null)}
               >
-                {link.name}
-              </Link>
+                <Link
+                  to={category.path}
+                  className={`px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg relative ${
+                    hoveredCategory === category.name
+                      ? 'text-gold-600 bg-gold-50'
+                      : 'text-black-700 hover:text-black-900'
+                  }`}
+                >
+                  {category.name}
+                  <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gold-600 transition-all duration-300 ${
+                    hoveredCategory === category.name ? 'w-full' : ''
+                  }`} />
+                </Link>
+              </div>
             ))}
           </nav>
 
-          {/* Right side actions */}
-          <div className="flex items-center space-x-4">
-            {/* Search form */}
-            <form onSubmit={handleSearch} className="hidden md:block relative">
+          {/* Right Side Actions - Enhanced */}
+          <div className="flex items-center gap-3">
+            
+            {/* Search Bar - Sleek Design */}
+            <form onSubmit={handleSearch} className="hidden md:block relative group">
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-field pr-10 w-48 lg:w-64 bg-black-50"
+                className="w-48 lg:w-64 px-4 py-2.5 pl-11 bg-black-50 border border-black-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500/50 transition-all duration-300 group-hover:bg-white group-hover:shadow-lg"
               />
-              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gold-600 hover:text-gold-700 transition-colors">
-                <Search className="w-5 h-5" />
-              </button>
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-black-400 group-hover:text-gold-600 transition-colors" />
             </form>
 
-            {/* Wishlist */}
-            <button className="hidden md:block p-2 text-black-600 hover:text-gold-600 transition-colors">
-              <Heart className="w-6 h-6" />
-            </button>
+            {/* Actions Icons */}
+            <div className="flex items-center gap-1">
+              {/* Wishlist */}
+              <button className="relative p-3 text-black-600 hover:text-gold-600 hover:bg-gold-50 rounded-full transition-all duration-300 group">
+                <Heart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              </button>
 
-            {/* Cart */}
-            <Link to="/cart" className="relative p-2 text-black-600 hover:text-gold-600 transition-colors group">
-              <div className="relative">
-                <ShoppingBag className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              {/* Cart with Badge */}
+              <Link to="/cart" className="relative p-3 text-black-600 hover:text-gold-600 hover:bg-gold-50 rounded-full transition-all duration-300 group">
+                <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-gradient-to-br from-gold-500 to-gold-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center shadow-md font-semibold">
+                  <span className="absolute top-1.5 right-1.5 bg-gradient-to-br from-gold-500 to-gold-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center shadow-lg font-bold ring-2 ring-white">
                     {cartCount}
                   </span>
                 )}
-              </div>
-            </Link>
+              </Link>
 
-            {/* User menu */}
-            {isAuthenticated && user ? (
-              <div className="relative group">
-                <button className="flex items-center justify-center p-1 hover:scale-105 transition-all duration-200">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 
-                                  flex items-center justify-center shadow-lg hover:shadow-xl 
-                                  ring-2 ring-white hover:ring-gold-300 transition-all duration-200">
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                  {/* Online status indicator */}
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full 
-                                  border-2 border-white animate-pulse"></div>
-                </button>
+              {/* User Menu - Premium Design */}
+              {isAuthenticated && user ? (
+                <div className="relative group ml-2">
+                  <button className="flex items-center gap-2 p-1.5 pr-3 bg-black-50 hover:bg-gold-50 rounded-full transition-all duration-300 border border-black-100 hover:border-gold-300">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 flex items-center justify-center shadow-md ring-2 ring-white">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-black-600 group-hover:text-gold-600 transition-colors" />
+                  </button>
 
-                {/* Dropdown */}
-                <div className="absolute right-0 mt-2 w-64 bg-white shadow-xl rounded-lg 
-                                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-                                transition-all duration-200 z-50 overflow-hidden">
-                  {/* User info header */}
-                  <div className="bg-gradient-to-br from-gold-500 to-gold-600 px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm 
-                                      flex items-center justify-center flex-shrink-0">
-                        <User className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-semibold text-sm truncate">{user?.name}</p>
-                        <p className="text-white/80 text-xs truncate">{user?.email}</p>
+                  {/* Premium Dropdown */}
+                  <div className="absolute right-0 mt-2 w-72 bg-white shadow-2xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden border border-gold-100">
+                    {/* User Header */}
+                    <div className="bg-gradient-to-br from-gold-500 to-gold-600 px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                          <User className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-white font-semibold text-sm">{user?.name}</p>
+                          <p className="text-white/80 text-xs">{user?.email}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Menu items */}
-                  <div className="py-2">
-                    {isAdmin && (
-                      <Link
-                        to="/admin/dashboard"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-black-700 
-                                   hover:bg-gold-50 hover:text-gold-600 transition-colors"
-                      >
-                        <LayoutDashboard className="w-4 h-4" />
-                        <span>Admin Dashboard</span>
+
+                    {/* Menu Items */}
+                    <div className="py-2">
+                      {isAdmin && (
+                        <Link to="/admin/dashboard" className="flex items-center gap-3 px-6 py-3 text-sm text-black-700 hover:bg-gold-50 hover:text-gold-600 transition-colors">
+                          <LayoutDashboard className="w-4 h-4" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      )}
+                      <Link to="/account/orders" className="flex items-center gap-3 px-6 py-3 text-sm text-black-700 hover:bg-gold-50 hover:text-gold-600 transition-colors">
+                        <ShoppingBag className="w-4 h-4" />
+                        <span>My Orders</span>
                       </Link>
-                    )}
-                    <Link
-                      to="/account/orders"
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-black-700 
-                                 hover:bg-gold-50 hover:text-gold-600 transition-colors"
-                    >
-                      <ShoppingBag className="w-4 h-4" />
-                      <span>My Orders</span>
-                    </Link>
-                    <Link
-                      to="/account/profile"
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-black-700 
-                                 hover:bg-gold-50 hover:text-gold-600 transition-colors"
-                    >
-                      <User className="w-4 h-4" />
-                      <span>Profile</span>
-                    </Link>
-                    <hr className="my-2 border-black-100" />
-                    <button
-                      onClick={logout}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 
-                                 hover:bg-red-50 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Logout</span>
-                    </button>
+                      <Link to="/account/profile" className="flex items-center gap-3 px-6 py-3 text-sm text-black-700 hover:bg-gold-50 hover:text-gold-600 transition-colors">
+                        <User className="w-4 h-4" />
+                        <span>Profile</span>
+                      </Link>
+                      <hr className="my-2 border-black-100" />
+                      <button onClick={logout} className="w-full flex items-center gap-3 px-6 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <Link to="/login" className="p-2 hover:text-gold-600 transition-colors">
-                <User className="w-6 h-6" />
-              </Link>
-            )}
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Link to="/login" className="px-5 py-2.5 bg-black-900 text-white text-sm font-medium rounded-full hover:bg-gold-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                  Login
+                </Link>
               )}
-            </button>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2.5 text-black-600 hover:bg-black-50 rounded-lg transition-colors"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu - Premium Design */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gold-200 animate-slide-down shadow-lg">
-          <div className="container-custom py-4">
-            {/* Mobile search */}
-            <form onSubmit={handleSearch} className="mb-4 relative">
+        <div className="lg:hidden bg-white border-t border-gold-200 animate-slide-down shadow-2xl">
+          <div className="container-custom py-6">
+            {/* Mobile Search */}
+            <form onSubmit={handleSearch} className="mb-6 relative">
               <input
                 type="text"
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-field pr-10 bg-black-50"
+                className="w-full px-4 py-3 pl-12 bg-black-50 border border-black-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500"
               />
-              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gold-600">
-                <Search className="w-5 h-5" />
-              </button>
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
             </form>
 
-            {/* Mobile nav links */}
-            <nav className="space-y-2">
-              {navLinks.map((link) => (
+            {/* Mobile Nav Links */}
+            <nav className="space-y-1 mb-6">
+              {categories.map((category) => (
                 <Link
-                  key={link.name}
-                  to={link.path}
+                  key={category.name}
+                  to={category.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block py-3 px-4 nav-link text-base rounded-lg hover:bg-gold-50"
+                  className="flex items-center gap-3 px-4 py-3.5 text-black-700 hover:bg-gold-50 hover:text-gold-600 rounded-xl transition-all duration-300 font-medium"
                 >
-                  {link.name}
+                  <span className="text-lg">{category.icon}</span>
+                  <span>{category.name}</span>
                 </Link>
               ))}
-              <div className="pt-4 border-t">
-                {isAuthenticated ? (
-                  <>
-                    {/* User info in mobile menu */}
-                    <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-black-50 rounded-lg">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center shadow-md flex-shrink-0">
-                        <User className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-black-900 truncate">{user?.name}</p>
-                        <p className="text-xs text-black-500 truncate">{user?.email}</p>
-                      </div>
+            </nav>
+
+            {/* Mobile User Section */}
+            <div className="pt-4 border-t border-black-100">
+              {isAuthenticated ? (
+                <>
+                  {/* User Info Card */}
+                  <div className="flex items-center gap-3 px-4 py-4 mb-4 bg-gradient-to-br from-gold-50 to-gold-100/50 rounded-xl border border-gold-200">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-lg flex-shrink-0">
+                      <User className="w-6 h-6 text-white" />
                     </div>
-                    
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-black-900 truncate">{user?.name}</p>
+                      <p className="text-xs text-black-500 truncate">{user?.email}</p>
+                    </div>
+                  </div>
+
+                  {/* Mobile Menu Links */}
+                  <div className="space-y-1">
                     <Link
                       to="/account/orders"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block py-2 nav-link"
+                      className="flex items-center gap-3 px-4 py-3 text-black-700 hover:bg-gold-50 hover:text-gold-600 rounded-xl transition-all duration-300 font-medium"
                     >
-                      My Orders
+                      <ShoppingBag className="w-5 h-5" />
+                      <span>My Orders</span>
                     </Link>
                     <Link
                       to="/account/profile"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block py-2 nav-link"
+                      className="flex items-center gap-3 px-4 py-3 text-black-700 hover:bg-gold-50 hover:text-gold-600 rounded-xl transition-all duration-300 font-medium"
                     >
-                      Profile
+                      <User className="w-5 h-5" />
+                      <span>Profile</span>
                     </Link>
                     {isAdmin && (
                       <Link
                         to="/admin/dashboard"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="block py-2 nav-link text-gold-600"
+                        className="flex items-center gap-3 px-4 py-3 text-gold-600 bg-gold-50 rounded-xl transition-all duration-300 font-medium"
                       >
-                        Admin Dashboard
+                        <LayoutDashboard className="w-5 h-5" />
+                        <span>Admin Dashboard</span>
                       </Link>
                     )}
                     <button
@@ -275,22 +283,24 @@ const Header = () => {
                         logout();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full text-left py-2 nav-link text-red-600"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 font-medium"
                     >
-                      Logout
+                      <LogOut className="w-5 h-5" />
+                      <span>Logout</span>
                     </button>
-                  </>
-                ) : (
-                  <Link
-                    to="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block py-2 nav-link"
-                  >
-                    Login / Register
-                  </Link>
-                )}
-              </div>
-            </nav>
+                  </div>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-black-900 text-white font-medium rounded-xl hover:bg-gold-600 transition-all duration-300 shadow-lg"
+                >
+                  <User className="w-5 h-5" />
+                  <span>Login / Register</span>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}
