@@ -15,14 +15,7 @@ import { upload, handleMulterError } from '../middleware/upload.js';
 
 const router = express.Router();
 
-// Public routes
-router.get('/', getProducts);
-router.get('/featured', getFeaturedProducts);
-router.get('/top-selling', getTopSellingProducts);
-router.get('/category/:category', getProductsByCategory);
-router.get('/:id', getProduct);
-
-// Debug route - test Cloudinary configuration
+// Debug route - test Cloudinary configuration (MUST be before /:id)
 router.get('/test-upload', (req, res) => {
   const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_URL;
   res.json({
@@ -33,6 +26,13 @@ router.get('/test-upload', (req, res) => {
     message: isCloudinaryConfigured ? 'Cloudinary is configured' : 'Cloudinary NOT configured'
   });
 });
+
+// Public routes
+router.get('/', getProducts);
+router.get('/featured', getFeaturedProducts);
+router.get('/top-selling', getTopSellingProducts);
+router.get('/category/:category', getProductsByCategory);
+router.get('/:id', getProduct);
 
 // Protected routes (Admin only)
 router.post('/', protect, authorize('admin'), upload.array('images', 5), handleMulterError, createProduct);
