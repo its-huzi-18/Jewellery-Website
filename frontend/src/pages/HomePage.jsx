@@ -100,9 +100,9 @@ const HomePage = () => {
                 {[
                   'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop&q=80',
                   'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80',
-                  'https://images.unsplash.com/photo-1598560916717-52f0e6d501f7?w=400&h=500&fit=crop&q=80',
+                  'https://unsplash.com/photos/gold-ring-on-white-surface-NhrcL_C0sFA',
                   'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop&q=80',
-                  'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80',
+                  // 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80',
                   'https://images.unsplash.com/photo-1598560916717-52f0e6d501f7?w=400&h=500&fit=crop&q=80'
                 ].map((img, index) => (
                   <Link
