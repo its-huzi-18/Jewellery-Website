@@ -31,12 +31,12 @@ const HomePage = () => {
   }, []);
 
   const categories = [
-    { name: 'Best Sellers', path: '/products?category=bestsellers', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=600&fit=crop' },
-    { name: 'Rings', path: '/products?category=rings', image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=600&fit=crop' },
-    { name: 'Charms', path: '/products?category=charms', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop' },
-    { name: 'Bracelets', path: '/products?category=bracelets', image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&h=600&fit=crop' },
-    { name: 'Necklaces & Pendants', path: '/products?category=necklaces', image: 'https://images.unsplash.com/photo-1599643478518-17488fbbcd75?w=600&h=600&fit=crop' },
-    { name: 'Earrings', path: '/products?category=earrings', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop' }
+    { name: 'Best Sellers', path: '/products?category=bestsellers', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=600&fit=crop&q=80' },
+    { name: 'Rings', path: '/products?category=rings', image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=600&fit=crop&q=80' },
+    { name: 'Charms', path: '/products?category=charms', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80' },
+    { name: 'Bracelets', path: '/products?category=bracelets', image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&h=600&fit=crop&q=80' },
+    { name: 'Necklaces & Pendants', path: '/products?category=necklaces', image: 'https://images.unsplash.com/photo-1599643477893-9933cc47775a?w=600&h=600&fit=crop&q=80' },
+    { name: 'Earrings', path: '/products?category=earrings', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80' }
   ];
 
   const features = [
@@ -101,9 +101,9 @@ const HomePage = () => {
                   'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop&q=80',
                   'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80',
                   'https://images.unsplash.com/photo-1598560916717-52f0e6d501f7?w=400&h=500&fit=crop&q=80',
+                  'https://images.unsplash.com/photo-1700159698842-c2d8e1848197?w=400&h=500&fit=crop&q=80',
                   'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop&q=80',
-                  'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80',
-                  'https://images.unsplash.com/photo-1598560916717-52f0e6d501f7?w=400&h=500&fit=crop&q=80'
+                  'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80'
                 ].map((img, index) => (
                   <Link
                     key={index}
