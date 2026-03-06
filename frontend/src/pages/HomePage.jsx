@@ -14,12 +14,12 @@ const HomePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [featuredRes, topSellingRes] = await Promise.all([
+        const [featuredRes, newestRes] = await Promise.all([
           productAPI.getFeatured(),
-          productAPI.getTopSelling()
+          productAPI.getProducts({ limit: 8, sort: 'newest' })
         ]);
-        setFeaturedProducts(featuredRes.data.data.products);
-        setTopSelling(topSellingRes.data.data.products);
+        setFeaturedProducts(newestRes.data.data.products);
+        setTopSelling(newestRes.data.data.products);
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
