@@ -35,9 +35,9 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const displayImage = imageError 
-    ? getFallbackImage(product.category) 
-    : (product.mainImage ? `${product.mainImage}&q=80&w=400` : getFallbackImage(product.category));
+  const displayImage = imageError
+    ? getFallbackImage(product.category)
+    : (product.mainImage ? product.mainImage : getFallbackImage(product.category));
 
   return (
     <Link to={`/products/${product._id}`} className="product-card group block animate-fade-in">
