@@ -99,9 +99,17 @@ const AdminProducts = () => {
     submitData.append('stock', formData.stock);
     submitData.append('featured', formData.featured);
 
-    formData.images.forEach((image) => {
+    console.log('=== Upload Debug Info ===');
+    console.log('Number of images to upload:', formData.images.length);
+    formData.images.forEach((image, index) => {
       submitData.append('images', image);
+      console.log(`Image ${index + 1}:`, image.name, image.size, image.type);
     });
+    console.log('FormData entries:');
+    for (let [key, value] of submitData.entries()) {
+      console.log(`${key}:`, value instanceof File ? `File(${value.name})` : value);
+    }
+    console.log('========================');
 
     try {
       if (editingProduct) {
