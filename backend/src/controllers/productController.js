@@ -99,38 +99,54 @@ export const getProducts = async (req, res) => {
       ];
     }
 
-    // Sort options
+    // Sort options - Enhanced for proper price sorting
     let sortOptions = {};
     if (sort) {
       switch (sort) {
         case 'price_asc':
-          sortOptions = { price: 1 };
+          // Sort by price ascending, put null prices at the end
+          sortOptions = { price: 1, createdAt: -1 };
           break;
         case 'price_desc':
-          sortOptions = { price: -1 };
+          // Sort by price descending, put null prices at the end
+          sortOptions = { price: -1, createdAt: -1 };
           break;
         case 'newest':
           sortOptions = { createdAt: -1 };
           break;
         case 'bestselling':
-          sortOptions = { soldCount: -1 };
+          sortOptions = { soldCount: -1, createdAt: -1 };
           break;
         default:
-          sortOptions = { createdAt: -1 };
+          sortOptions = { featured: -1, createdAt: -1 };
       }
     } else {
       sortOptions = { featured: -1, createdAt: -1 };
     }
+
+    console.log('=== Sort Debug ===');
+    console.log('Sort param:', sort);
+    console.log('Sort options:', sortOptions);
 
     // Pagination
     const skip = (page - 1) * limit;
     const total = await Product.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
 
+    console.log('Query:', query);
+    console.log('Skip:', skip, 'Limit:', limit);
+
     const products = await Product.find(query)
       .sort(sortOptions)
       .skip(skip)
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean(); // Use lean() for better performance
+
+    console.log('Products found:', products.length);
+    if (sort && sort.includes('price')) {
+      console.log('First 3 product prices:', products.slice(0, 3).map(p => p.price));
+      console.log('Last 3 product prices:', products.slice(-3).map(p => p.price));
+    }
 
     res.status(200).json({
       success: true,
