@@ -104,18 +104,18 @@ export const getProducts = async (req, res) => {
     if (sort) {
       switch (sort) {
         case 'price_asc':
-          // Sort by price ascending, put null prices at the end
-          sortOptions = { price: 1, createdAt: -1 };
+          // Sort by price ascending, ensure consistent ordering with secondary sort
+          sortOptions = { price: 1, _id: 1 };
           break;
         case 'price_desc':
-          // Sort by price descending, put null prices at the end
-          sortOptions = { price: -1, createdAt: -1 };
+          // Sort by price descending, ensure consistent ordering with secondary sort
+          sortOptions = { price: -1, _id: 1 };
           break;
         case 'newest':
-          sortOptions = { createdAt: -1 };
+          sortOptions = { createdAt: -1, _id: -1 };
           break;
         case 'bestselling':
-          sortOptions = { soldCount: -1, createdAt: -1 };
+          sortOptions = { soldCount: -1, _id: 1 };
           break;
         default:
           sortOptions = { featured: -1, createdAt: -1 };
@@ -126,7 +126,7 @@ export const getProducts = async (req, res) => {
 
     console.log('=== Sort Debug ===');
     console.log('Sort param:', sort);
-    console.log('Sort options:', sortOptions);
+    console.log('Sort options:', JSON.stringify(sortOptions));
 
     // Pagination
     const skip = (page - 1) * limit;
