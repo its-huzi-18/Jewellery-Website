@@ -102,6 +102,12 @@ const ProductsPage = () => {
   const handlePageChange = (page) => {
     const params = new URLSearchParams(searchParams);
     params.set('page', page.toString());
+    
+    console.log('=== Page Change ===');
+    console.log('Current URL params:', searchParams.toString());
+    console.log('New params:', params.toString());
+    console.log('Sort in params:', params.get('sort'));
+    
     setSearchParams(params);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
