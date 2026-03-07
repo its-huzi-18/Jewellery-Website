@@ -98,9 +98,9 @@ const HomePage = () => {
             <div className="order-1 lg:order-2 relative">
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop&q=80',
-                  'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80',
+                  // 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=500&fit=crop&q=80',
                   'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=400&h=500&fit=crop&q=80',
+                  'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&h=500&fit=crop&q=80',
                   'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=400&h=500&fit=crop&q=80',
                   'https://images.unsplash.com/photo-1608042314453-ae338d80c427?w=400&h=500&fit=crop&q=80',
                   'https://images.unsplash.com/photo-1654700005435-8af6c06f3716?w=400&h=500&fit=crop&q=80'
