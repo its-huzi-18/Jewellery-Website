@@ -51,15 +51,21 @@ const ProductsPage = () => {
           limit: 12
         };
 
+        console.log('=== Fetch Products ===');
+        console.log('Sort param from URL:', searchParams.get('sort'));
+        console.log('Final params being sent:', params);
+
         // Remove empty params
         Object.keys(params).forEach(key => {
           if (params[key] === '') delete params[key];
         });
 
         const { data } = await productAPI.getProducts(params);
+        console.log('Products received:', data.data.products.length);
+        console.log('First product price:', data.data.products[0]?.price);
         setProducts(data.data.products);
         setPagination(data.data.pagination);
-        
+
         // Update filters state to match URL
         setFilters({
           category: params.category || '',
